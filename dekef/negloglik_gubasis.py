@@ -1,4 +1,4 @@
-from denest_kernelexpofam.kernel_function import *
+from dekef.kernel_function import *
 
 
 def negloglik_gubasis_grad_logpar_batchmc(data, kernel_function, base_density, coef, batch_size, tol_param,
@@ -533,7 +533,7 @@ def negloglik_gubasis_gd_estimation(data, kernel_function, base_density, lambda_
         print("Iter = {iter_num}, GradNorm = {gradnorm}, Relative Error = {error}".format(
             iter_num=iter_num, gradnorm=grad0_norm, error=error))
 
-    while error > rel_tol and iter_num <= max_iter:
+    while error > rel_tol and iter_num < max_iter:
         
         current_iter = new_iter
         
