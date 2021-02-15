@@ -13,10 +13,12 @@ class Baseden:
     """
     
     def __init__(self):
+        
         pass
     
     @staticmethod
     def __type__():
+        
         return 'base_density'
     
 
