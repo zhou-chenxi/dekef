@@ -48,7 +48,10 @@ def scorematching_earlystopping_arbistep_update(data, kernel_function, base_dens
 		
 		# form the C matrix and the h vector
 		c_mat = kernel_function.partial_kernel_matrix_11(data)
-		h_vec = vector_h(data=data, kernel_function=kernel_function, base_density=base_density)
+		h_vec = vector_h(
+			data=data,
+			kernel_function=kernel_function,
+			base_density=base_density)
 		
 		ei_values, ei_vector = np.linalg.eigh(c_mat)
 		ei_values1 = step_size * ei_values / N
@@ -186,7 +189,7 @@ def scorematching_earlystopping_optiter_new(data, kernel_function, base_density,
 				data=train_data,
 				new_data=test_data,
 				coef=coef_vec,
-				kernel_function=kernel_function,
+				kernel_function=kernel_function_sub,
 				base_density=base_density)
 		
 		sm_scores[j, ] = score / k_folds
