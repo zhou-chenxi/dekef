@@ -1,6 +1,7 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
-from denest_kernelexpofam.unnormalized_density import *
+from dekef.unnormalized_density import *
 import sys
 
 
