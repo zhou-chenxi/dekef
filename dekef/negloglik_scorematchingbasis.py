@@ -421,7 +421,7 @@ def negloglik_penalized_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, re
     return output
 
 
-def negloglik_smbasis_gd_estimation(data, kernel_function, base_density, lambda_param,
+def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
                                     optalgo_params, batchmc_params,
                                     batch_mc=True, batch_mc_se=False, print_error=True):
     
@@ -871,7 +871,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
                 max_iter=optalgo_params["max_iter"],
                 rel_tol=optalgo_params["rel_tol"])
             
-            coef = negloglik_smbasis_gd_estimation(
+            coef = negloglik_smbasis_coef(
                 data=train_data,
                 kernel_function=kernel_function_sub,
                 base_density=base_density,
@@ -910,7 +910,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
     print("-" * 50 + "\nFinal run with the optimal lambda.")
 
     # compute the coefficient vector at the optimal penalty parameter
-    opt_coef = negloglik_smbasis_gd_estimation(
+    opt_coef = negloglik_smbasis_coef(
         data=data,
         kernel_function=kernel_function,
         base_density=base_density,
