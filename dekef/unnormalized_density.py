@@ -1,4 +1,4 @@
-from denest_kernelexpofam.scorematching_common_functions import *
+from dekef.scorematching_common_functions import *
 
 
 class UnnormalizedDensity:
