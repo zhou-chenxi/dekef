@@ -141,7 +141,7 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
             train_data = data[folds_i != i, ]
             test_data = data[folds_i == i, ]
             
-            if kernel_function.kernel_type == 'gaussianpoly2':
+            if kernel_function.kernel_type == 'gaussian_poly2w':
                 
                 kernel_function_sub = GaussianPoly2(data=train_data,
                                                     r1=kernel_function.r1,
@@ -149,7 +149,7 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
                                                     c=kernel_function.c,
                                                     bw=kernel_function.bw)
                 
-            elif kernel_function.kernel_type == 'rationalquadpoly2':
+            elif kernel_function.kernel_type == 'rationalquad_poly2':
                 
                 kernel_function_sub = RationalQuadPoly2(data=train_data,
                                                         r1=kernel_function.r1,
