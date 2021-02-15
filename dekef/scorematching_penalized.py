@@ -1,6 +1,6 @@
-from denest_kernelexpofam.kernel_function import *
-from denest_kernelexpofam.scorematching_common_functions import *
-from denest_kernelexpofam.scorematching_loss_function import *
+from dekef.kernel_function import *
+from dekef.scorematching_common_functions import *
+from dekef.scorematching_loss_function import *
 
 
 def scorematching_penalized_coef(data, kernel_function, base_density, lambda_param):
