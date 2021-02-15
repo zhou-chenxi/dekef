@@ -140,8 +140,8 @@ class UnnormalizedDensity:
         if d != self.dim: 
             raise ValueError("The dimensionality of new_data does not match that of data.")
         
-        baseden_part = self.base_density.baseden_eval(new_data)
-        exp_part = np.exp(self.kernel_function.kernel_gram_matrix(new_data).T, self.coef).flatten()
+        baseden_part = self.base_density.baseden_eval(new_data).flatten()
+        exp_part = np.exp(np.matmul(self.kernel_function.kernel_gram_matrix(new_data).T, self.coef)).flatten()
         
         output = baseden_part * exp_part
         
