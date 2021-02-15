@@ -60,8 +60,6 @@ def scorematching_earlystopping_arbistep_update(data, kernel_function, base_dens
 		coef1 = - step_size ** 2 / N * np.matmul(np.matmul(np.matmul(ei_vector, np.diag(tilde_lamb)),
 														   ei_vector.T), h_vec)
 		
-		print(coef1[:5])
-		
 		coef = np.vstack([coef1, (iter_num + 1) * step_size])
 		
 		return coef
