@@ -141,7 +141,7 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
             train_data = data[folds_i != i, ]
             test_data = data[folds_i == i, ]
             
-            if kernel_function.kernel_type == 'gaussian_poly2w':
+            if kernel_function.kernel_type == 'gaussian_poly2':
                 
                 kernel_function_sub = GaussianPoly2(data=train_data,
                                                     r1=kernel_function.r1,
