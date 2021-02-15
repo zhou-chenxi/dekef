@@ -1,6 +1,6 @@
 from scipy import integrate
 from scipy import stats
-from denest_kernelexpofam.base_density import *
+from dekef.base_density import *
 
 
 class NormalDensity:
