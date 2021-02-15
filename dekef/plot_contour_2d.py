@@ -1,6 +1,7 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
-from denest_kernelexpofam.unnormalized_density import *
+from dekef.unnormalized_density import *
 
 
 def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, plot_domain, method,
