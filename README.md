@@ -53,7 +53,7 @@ npm test
 ## History
 
 * 0.3
-    * Add example Jupyter notebooks - February 15, 2021
+    * Add Jupyter notebooks in examples - February 15, 2021
   
 * 0.2
     * Update functions of visualizing density estimates  - February 14, 2021
