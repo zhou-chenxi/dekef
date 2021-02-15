@@ -3,8 +3,8 @@ from dekef.scorematching_common_functions import *
 from dekef.scorematching_loss_function import *
 
 
-def scorematching_earlystopping_arbistep_update(data, kernel_function, base_density, iter_num, step_size,
-												threshold=1e-8):
+def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_num, step_size, threshold=1e-8):
+	
 	"""
 	Computes the coefficients of basis functions in the early stopping score matching density estimation,
 	assuming the starting point of the gradient descent algorithm is the zero function.
@@ -68,8 +68,8 @@ def scorematching_earlystopping_arbistep_update(data, kernel_function, base_dens
 		return coef
 
 
-def scorematching_earlystopping_optiter_new(data, kernel_function, base_density, iternum_cand, k_folds, step_size,
-											save_dir, save_info=False, threshold=1e-8):
+def scorematching_earlystopping_optiter(data, kernel_function, base_density, iternum_cand, k_folds, step_size,
+										save_dir, save_info=False, threshold=1e-8):
 	
 	"""
 	Selects the optimal number of iterations in the early stopping score matching density estimation
@@ -176,7 +176,7 @@ def scorematching_earlystopping_optiter_new(data, kernel_function, base_density,
 										   "'rationalquad_poly2'."))
 			
 			# compute the coefficient vector for the given lambda
-			coef_vec = scorematching_earlystopping_arbistep_update(
+			coef_vec = scorematching_earlystopping_coef(
 				data=train_data,
 				kernel_function=kernel_function_sub,
 				base_density=base_density,
@@ -203,7 +203,7 @@ def scorematching_earlystopping_optiter_new(data, kernel_function, base_density,
 	opt_iter = iternum_cand[np.argmin(sm_scores)]
 	
 	# compute the coefficient vector at the optimal regularization parameter
-	opt_coef = scorematching_earlystopping_arbistep_update(
+	opt_coef = scorematching_earlystopping_coef(
 		data=data,
 		kernel_function=kernel_function,
 		base_density=base_density,
