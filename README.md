@@ -35,7 +35,7 @@ edit autoexec.bat
 
 ## Examples
 
-Please refer to Jupyter notebooks in `/example` for examples of 
+Please refer to Jupyter notebooks in `/examples` for examples of 
 how to use functions to compute and visualize density estimates 
 and assess their qualities. 
 
@@ -52,14 +52,20 @@ npm test
 
 ## History
 
-* 0.0.1
+* 0.3
+    * Add example Jupyter notebooks - February 15, 2021
+  
+* 0.2
+    * Update functions of visualizing density estimates  - February 14, 2021
+
+* 0.1
     * Work in progress - February 11, 2021
 
 ## Meta
 
 Chenxi Zhou – zhou.779@osu.edu
 
-[https://github.com/zhoucx1119/denest-kernelexpofam](https://github.com/zhoucx1119/denest-kernelexpofam)
+[https://github.com/zhoucx1119/dekef](https://github.com/zhoucx1119/dekef)
 
 <!---
 ## Contributing
