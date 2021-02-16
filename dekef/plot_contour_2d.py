@@ -133,7 +133,7 @@ def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, plot
 		cp = ax.contour(x0_mesh, x1_mesh, plot_val)
 		ax.clabel(cp, inline=True, fontsize=10)
 	
-	ax.set_title('Contour Plot (' + method + ')')
+	ax.set_title('Contour Plot (' + method + ')', fontsize=plot_kwargs['fontsize'])
 	ax.set_xlabel(x_label)
 	ax.set_ylabel(y_label)
 	if save_plot:
