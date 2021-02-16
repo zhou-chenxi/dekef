@@ -156,7 +156,7 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
              alpha=plot_kwargs['hist_alpha'])
     # plt.plot(data, [0.01] * len(data), '|', color = 'k')
     
-    ax.set_title('Density Plot (' + method + ')')
+    ax.set_title('Density Plot (' + method + ')', fontsize=plot_kwargs['fontsize'])
     ax.set_xlabel(x_label, fontsize=plot_kwargs['fontsize'])
     ax.set_ylabel('density', fontsize=plot_kwargs['fontsize'])
     ax.set_xlim(plot_kwargs['x_limit'])
@@ -367,7 +367,7 @@ def plot_density_1d_scorematchingbasis_updated(data, kernel_function, base_densi
     
     # plt.plot(data, [0.01] * len(data), '|', color = 'k')
     
-    ax.set_title('Density Plot (' + method + ')')
+    ax.set_title('Density Plot (' + method + ')', fontsize=plot_kwargs['fontsize'])
     ax.set_xlabel(x_label)
     ax.set_ylabel('density')
     ax.set_xlim(plot_kwargs['x_limit'])
