@@ -7,13 +7,13 @@
 [![Build Status][travis-image]][travis-url]
 [![Downloads Stats][npm-downloads]][npm-url]--->
 
-dekef provides tools for 
+`dekef` is a python package providing tools for 
 
-- computing density estimates in kernel exponential families using 
-  the negative log-likelihood loss function and the score matching
-  loss function,
-- visualizing density estimates when data are 
-  1-dimensional or their contour plots when data are 2-dimensional, and
+- computing density estimates in kernel exponential families using the score matching
+  loss function and the negative log-likelihood loss function, 
+- visualizing the density estimate when data are 1-dimensional or 
+  the contour plot of the density estimate when data are 
+  2-dimensional, and
 - assessing the quality of density estimates using the correlation and 
   the mean integrated squared error ([MISE](https://en.wikipedia.org/wiki/Mean_integrated_squared_error)).
   
