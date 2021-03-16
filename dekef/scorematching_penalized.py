@@ -1,6 +1,7 @@
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 from dekef.scorematching_loss_function import *
+from check import *
 
 
 def scorematching_penalized_coef(data, kernel_function, base_density, lambda_param):
@@ -15,11 +16,11 @@ def scorematching_penalized_coef(data, kernel_function, base_density, lambda_par
 
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     lambda_param : float
         The penalty parameter. Must be non-negative.
@@ -27,7 +28,7 @@ def scorematching_penalized_coef(data, kernel_function, base_density, lambda_par
     Returns
     -------
     numpy.ndarray
-        An array of coefficients for the penalized score matching density estimate.
+        An array of coefficients of basis function in the penalized score matching density estimate.
     
     References
     ----------
@@ -35,6 +36,10 @@ def scorematching_penalized_coef(data, kernel_function, base_density, lambda_par
         in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research: JMLR 18 (57): 1–59.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
 
     # check that lambda must be non-negative
     if lambda_param < 0.:
@@ -64,7 +69,8 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
     
     """
     Selects the optimal penalty parameter in the penalized score matching density estimation
-    using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
+    using k-fold cross validation and computes the coefficient vector of basis functions
+    at this optimal penalty parameter.
     
     Parameters
     ----------
@@ -73,14 +79,14 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
 
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
 
     lambda_cand : list or 1-dimensional numpy.ndarray
-        The list of penalty parameter candidates. Each of them must be non-negative.
+        The list of penalty parameter candidates. Each component must be non-negative.
 
     k_folds : int
         The number of folds for cross validation.
@@ -97,7 +103,8 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
     -------
     dict
         A dictionary containing opt_lambda, the optimal penalty parameter, and
-        opt_coef, the coefficient vector at the optimal penalty parameter.
+        opt_coef, the coefficient vector of basis functions in the penalized score matching density estimate
+        at the optimal penalty parameter.
     
     References
     ----------
@@ -105,6 +112,10 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
         in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research: JMLR 18 (57): 1–59.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
 
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
