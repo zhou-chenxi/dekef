@@ -6,20 +6,20 @@ from dekef.base_density import *
 class NormalDensity:
     
     """
-    A class for the true density being the multivariate normal distribution.
+    A class of the multivariate normal distribution as the true distribution for the simulation purpose.
     
     ...
 
     Attributes
     ----------
-    mean : 1-dimensional numpy.ndarray
+    mean : numpy.ndarray
         The mean vector of the multivariate normal distribution.
     
     covmat : numpy.ndarray
         The covariance matrix of the multivariate normal distribution.
     
     type : str
-        The name of the true density function; i.e., "normal".
+        The name of the true distribution; i.e., "normal".
 
     Methods
     -------
@@ -30,15 +30,15 @@ class NormalDensity:
         Draws samples from the multivariate normal distribution of sample size n_samples.
     
     density_eval_1d(x)
-        Evaluate the multivariate normal density function at a 1-dimensional data point x.
+        Evaluates the density function of the normal distribution at a 1-dimensional data point x.
     
     density_eval_2d(x0, x1)
-        Evaluate the multivariate normal density function at a 2-dimensional data point (x0, x1),
+        Evaluates the density function of the multivariate normal distribution at a 2-dimensional data point (x0, x1),
         where x0 and x1 are the two coordinates, respectively.
     
     density_eval_3d(x0, x1, x2)
-        Evaluate the multivariate normal density function at a 3-dimensional data point (x0, x1, x2),
-        where x0, x1 and x2 are the three coordinates, respectively.
+        Evaluates the density function of the multivariate normal distribution at a 3-dimensional data point
+        (x0, x1, x2), where x0, x1 and x2 are the three coordinates, respectively.
         
     """
     
@@ -47,7 +47,7 @@ class NormalDensity:
         """
         Parameters
         ----------
-        mean : 1-dimensional numpy.ndarray
+        mean : numpy.ndarray
             The mean vector of the multivariate normal distribution.
     
         covmat : numpy.ndarray
@@ -67,7 +67,7 @@ class NormalDensity:
         Parameters
         ----------
         x : numpy.ndarray
-            The array of data at which the density values of the multivariate normal distribution is to be evaluated.
+            The array of data at which the density function of the multivariate normal distribution is to be evaluated.
 
         Returns
         -------
@@ -88,12 +88,12 @@ class NormalDensity:
         Parameters
         ----------
         n_samples : int
-            The number of new samples to be drawn.
+            The number of samples to be drawn.
 
         Returns
         -------
         numpy.ndarray
-            An array of shape (n_samples, self.dim) of new samples drawn from the multivariate normal distribution.
+            An array of shape (n_samples, self.dim) of samples drawn from the multivariate normal distribution.
             
         """
 
@@ -104,17 +104,17 @@ class NormalDensity:
     def density_eval_1d(self, x):
         
         """
-        Evaluate the multivariate normal density function at a 1-dimensional data point x.
+        Evaluates the normal density function at a 1-dimensional data point x.
 
         Parameters
         ----------
         x : float
-            A floating point number at which the multivariate normal density function is to be evaluated.
+            A floating point number at which the normal density function is to be evaluated.
 
         Returns
         -------
         float
-            A floating point number of the multivariate normal density value at x.
+            The normal density value at x.
             
         """
 
@@ -132,7 +132,7 @@ class NormalDensity:
     def density_eval_2d(self, x0, x1):
         
         """
-        Evaluate the multivariate normal density function at a 2-dimensional data point (x0, x1),
+        Evaluates the multivariate normal density function at a 2-dimensional data point (x0, x1),
         where x0 and x1 are the two coordinates, respectively.
 
         Parameters
@@ -144,7 +144,7 @@ class NormalDensity:
         Returns
         -------
         float
-            A floating point number of the multivariate normal density value at (x0, x1).
+            The multivariate normal density value at (x0, x1).
             
         """
 
@@ -168,7 +168,7 @@ class NormalDensity:
     def density_eval_3d(self, x0, x1, x2):
         
         """
-        Evaluate the multivariate normal density function at a 3-dimensional data point (x0, x1, x2),
+        Evaluates the multivariate normal density function at a 3-dimensional data point (x0, x1, x2),
         where x0, x1 and x2 are the three coordinates, respectively.
 
         Parameters
@@ -180,7 +180,7 @@ class NormalDensity:
         Returns
         -------
         float
-            A floating point number of the multivariate normal density value at (x0, x1, x2).
+            The multivariate normal density value at (x0, x1, x2).
 
         """
 
@@ -205,44 +205,46 @@ class NormalDensity:
 class MixNormalDensity:
     
     """
-    A class for the true density being the mixed multivariate normal distribution.
+    A class of the mixture of multivariate normal distributions as the true distribution for the simulation purpose.
 
     ...
 
     Attributes
     ----------
     mix_weights : list or numpy.ndarray
+        The list or array of mixture weights. Each component must be strictly positive and
+        all components must sum to 1.
     
-    mean : 1-dimensional numpy.ndarray
-        The mean vector of the multivariate normal distribution.
+    mean : numpy.ndarray
+        The mean vectors of each multivariate normal distribution component.
     
     covmat : numpy.ndarray
-        The covariance matrix of the multivariate normal distribution.
+        The covariance matrices of each multivariate normal distribution component.
     
     n_comps : int
-        The number of mixture components in the mixed multivariate normal distribution.
+        The number of mixture components in the mixture of multivariate normal distributions.
     
     type : str
-        The name of the true density function; i.e., "mix_normal".
+        The name of the true distribution; i.e., "mix_normal".
 
     Methods
     -------
     density_eval(x)
-        Evaluates the density function of the mixed multivariate normal distribution at x.
+        Evaluates the density function of the mixture of multivariate normal distributions at x.
     
     sample(n_samples)
-        Draws samples from the mixed multivariate normal distribution of sample size n_samples.
+        Draws samples from the mixture of multivariate normal distributions of sample size n_samples.
         
     density_eval_1d(x)
-        Evaluate the mixed multivariate normal density function at a 1-dimensional data point x.
+        Evaluates the density function of the mixture of normal distributions at a 1-dimensional data point x.
     
     density_eval_2d(x0, x1)
-        Evaluate the mixed multivariate normal density function at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively.
+        Evaluates the density function of the mixture of multivariate normal distributions
+        at a 2-dimensional data point (x0, x1), where x0 and x1 are the two coordinates, respectively.
     
     density_eval_3d(x0, x1, x2)
-        Evaluate the mixed multivariate normal density function at a 3-dimensional data point (x0, x1),
-        where x0, x1 and x2 are the three coordinates, respectively.
+        Evaluates the density function of the mixture of multivariate normal distributions
+        at a 3-dimensional data point (x0, x1, x2), where x0, x1 and x2 are the three coordinates, respectively.
         
     """
     
@@ -253,14 +255,13 @@ class MixNormalDensity:
         ----------
         mix_weights : list or 1-dimensional numpy.ndarray
             The mixture weights of each multivariate normal distribution component.
-            Each element of mix_weights must be strictly positive, and
-            the sum of all elements must be equal to 1.
+            Each component must be strictly positive, and all components must sum to 1.
             
-        mean : 1-dimensional numpy.ndarray
-            The mean vector of the multivariate normal distribution.
+        mean : numpy.ndarray
+            The mean vectors of each multivariate normal distribution component.
     
         covmat : numpy.ndarray
-            The covariance matrix of the multivariate normal distribution.
+            The covariance matrices of each multivariate normal distribution component.
         
         """
 
@@ -298,18 +299,18 @@ class MixNormalDensity:
     def density_eval(self, x):
         
         """
-        Evaluates the density function of the mixed multivariate normal distribution at x.
+        Evaluates the density function of the mixture of multivariate normal distributions at x.
         
         Parameters
         ----------
         x : numpy.ndarray
-            The array of data at which the density values of the mixed multivariate normal distribution
+            The array of data at which the density function of the mixture of multivariate normal distributions
             is to be evaluated.
 
         Returns
         -------
         numpy.ndarray
-            The array of density values of the mixed multivariate normal distribution at x.
+            The density values of the mixture of multivariate normal distributions at x.
             
         """
 
@@ -325,18 +326,18 @@ class MixNormalDensity:
     def sample(self, n_samples):
         
         """
-        Draws samples from the mixed multivariate normal distribution of sample size n_samples.
+        Draws samples from the mixture of multivariate normal distributions of sample size n_samples.
         
         Parameters
         ----------
         n_samples : int
-            The number of new samples to be drawn.
+            The number of samples to be drawn.
 
         Returns
         -------
         numpy.ndarray
-            An array of shape (n_samples, self.dim) of new samples drawn
-            from the mixed multivariate normal distribution.
+            An array of shape (n_samples, self.dim) of samples drawn
+            from the mixture of multivariate normal distributions.
         
         """
 
@@ -354,17 +355,19 @@ class MixNormalDensity:
     def density_eval_1d(self, x):
         
         """
-        Evaluate the mixed multivariate normal density function at a 1-dimensional data point x.
+        Evaluates the density function of the mixture of normal distributions
+        at a 1-dimensional data point x.
         
         Parameters
         ----------
         x : float
-            A floating point number at which the mixed multivariate normal density function is to be evaluated.
+            A floating point number at which the density function of the mixture of normal distributions
+            is to be evaluated.
 
         Returns
         -------
         float
-            A floating point number of the mixed multivariate normal density value at x.
+            The density value of the mixture of normal distribution at x.
             
         """
 
@@ -394,19 +397,19 @@ class MixNormalDensity:
     def density_eval_2d(self, x0, x1):
 
         """
-        Evaluate the mixed multivariate normal density function at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively.
+        Evaluates the density function of the mixture of multivariate normal distributions
+        at a 2-dimensional data point (x0, x1), where x0 and x1 are the two coordinates, respectively.
 
         Parameters
         ----------
         x0, x1 : float
             Two floating point numbers forming the coordinates of a 2-dimensional data point at which
-            the mixed multivariate normal density function is to be evaluated.
+            the density function of the mixture of multivariate normal distributions is to be evaluated.
 
         Returns
         -------
         float
-            A floating point number of the mixed multivariate normal density value at (x0, x1).
+            The density value of the mixture of multivariate normal distributions at (x0, x1).
 
         """
 
@@ -440,19 +443,19 @@ class MixNormalDensity:
     def density_eval_3d(self, x0, x1, x2):
         
         """
-        Evaluate the mixed multivariate normal density function at a 3-dimensional data point (x0, x1),
-        where x0, x1 and x2 are the three coordinates, respectively.
+        Evaluates the density function of the mixture of multivariate normal distributions
+        at a 3-dimensional data point (x0, x1, x2), where x0, x1 and x2 are the three coordinates, respectively.
 
         Parameters
         ----------
         x0, x1, x2 : float
             Three floating point numbers forming the coordinates of a 3-dimensional data point at which
-            the mixed multivariate normal density function is to be evaluated.
+            the density function of the mixture of multivariate normal distributions is to be evaluated.
 
         Returns
         -------
         float
-            A floating point number of the mixed multivariate normal density value at (x0, x1, x2).
+            The density value of the mixture of multivariate normal distributions at (x0, x1, x2).
             
         """
 
@@ -489,10 +492,9 @@ class MixNormalDensity:
 class TwoMoonsDensity:
     
     """
-    
-    A class for the true density being the two moon distribution. Its log density function is
-    - (1 / 2) ((sqrt{x0 ^ 2 + x1 ^ 2} - 2) / 0.4) ^ 2 + log (exp (- ((x1 - 2) / 0.6) ^ 2 / 2) +
-    exp (- ((x1 + 2) / 0.6) ^ 2 / 2), up to a normalizing constant.
+    A class of the two moon distribution as the true distribution for the simulation purpose.
+    Its density function is proportional to exp (- (1 / 2) ((sqrt{x0 ^ 2 + x1 ^ 2} - 2) / 0.4) ^ 2 +
+    log (exp (- ((x1 - 2) / 0.6) ^ 2 / 2) + exp (- ((x1 + 2) / 0.6) ^ 2 / 2)), up to the normalizing constant.
     
     ...
 
@@ -502,22 +504,23 @@ class TwoMoonsDensity:
         The domain of the two moon distribution; default is [[-3., 3.], [-3., 3.]].
     
     type : str
-        The name of the true density function; i.e., "two_moons".
+        The name of the true distribution; i.e., "two_moons".
 
     Methods
     -------
-    unnormalized_den_eval(x0, x1):
-        Evaluates the un-normalized density value of the two moon distribution at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively.
+    unnormalized_den_eval(x0, x1)
+        Evaluates the un-normalized density function of the two moon distribution
+        at a 2-dimensional data point (x0, x1), where x0 and x1 are the two coordinates, respectively.
         
     normalizing_const()
-        Computes the normalizing constant of the two moon distribution over domain.
+        Computes the normalizing constant of the density function of the two moon distribution over domain.
         
     density_eval(x)
         Evaluates the density function of the two moon distribution at x.
         
     sample(n_samples)
-        Draws samples from the two moon distribution of sample size n_samples using the acceptance-rejection algorithm.
+        Draws samples from the two moon distribution of sample size n_samples
+        using the acceptance-rejection algorithm.
     
     """
     
@@ -539,19 +542,19 @@ class TwoMoonsDensity:
     def unnormalized_den_eval(self, x0, x1):
 
         """
-        Evaluates the un-normalized density value of the two moon distribution at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively.
+        Evaluates the un-normalized density function of the two moon distribution
+        at a 2-dimensional data point (x0, x1), where x0 and x1 are the two coordinates, respectively.
         
         Parameters
         ----------
         x0, x1 : float
             Two floating point numbers forming the coordinates of a 2-dimensional data point at which
-            the two moon density function is to be evaluated.
+            the density function of the two moon distribution is to be evaluated.
 
         Returns
         -------
         float
-            A floating point number of the two moon density value at (x0, x1).
+           The density value of the two moon distribution at (x0, x1).
         
         """
 
@@ -571,11 +574,11 @@ class TwoMoonsDensity:
     def normalizing_const(self):
         
         """
-        Computes the normalizing constant of the two moon distribution over domain.
+        Computes the normalizing constant of the density function of the two moon distribution over domain.
         
         Returns
         -------
-        The normalizing constant of the two moon distribution over domain.
+        The normalizing constant of the density function of the two moon distribution over domain.
         
         """
 
@@ -597,7 +600,7 @@ class TwoMoonsDensity:
         Returns
         -------
         numpy.ndarray
-            The array of density values of the multivariate normal distribution at x.
+            The array of density values of the two moon distribution at x.
         
         """
 
@@ -624,17 +627,18 @@ class TwoMoonsDensity:
     def sample(self, n_samples):
         
         """
-        Draws samples from the two moon distribution of sample size n_samples using the acceptance-rejection algorithm.
+        Draws samples from the two moon distribution of sample size n_samples
+        using the acceptance-rejection algorithm.
         
         Parameters
         ----------
         n_samples : int
-            The number of new samples to be drawn.
+            The number of samples to be drawn.
 
         Returns
         -------
         numpy.ndarray
-            An array of shape (n_samples, 2) of new samples drawn from the two moon distribution.
+            An array of shape (n_samples, 2) of samples drawn from the two moon distribution.
 
         """
 
