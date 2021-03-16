@@ -1,4 +1,5 @@
 import numpy as np
+from check import *
 
 
 def scorematching_loss_function(data, new_data, coef, kernel_function, base_density):
@@ -21,11 +22,11 @@ def scorematching_loss_function(data, new_data, coef, kernel_function, base_dens
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
 
     Returns
     -------
@@ -33,6 +34,10 @@ def scorematching_loss_function(data, new_data, coef, kernel_function, base_dens
         The value of the score matching loss function evaluated on new_data.
         
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
