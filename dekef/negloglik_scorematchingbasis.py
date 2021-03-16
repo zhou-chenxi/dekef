@@ -1,3 +1,4 @@
+import warnings
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 
@@ -394,7 +395,7 @@ def negloglik_penalized_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, re
         The starting point of the gradient descent algorithm to minimize
         the penalized negative log-likelihood loss function.
     
-    step_size : float
+    step_size : float or list or numpy.ndarray
         The step size of the gradient descent algorithm; default is 0.01.
     
     max_iter : int
@@ -422,8 +423,8 @@ def negloglik_penalized_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, re
 
 
 def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
-                                    optalgo_params, batchmc_params,
-                                    batch_mc=True, batch_mc_se=False, print_error=True):
+                           optalgo_params, batchmc_params,
+                           batch_mc=True, batch_mc_se=False, print_error=True):
     
     """
     Returns the solution to minimizing the penalized negative log-likelihood loss function
@@ -486,6 +487,19 @@ def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
     step_size = optalgo_params["step_size"]
     max_iter = optalgo_params["max_iter"]
     rel_tol = optalgo_params["rel_tol"]
+    
+    if type(step_size) not in [float, list, np.ndarray]:
+        raise TypeError(("The type of step_size in optalgo_params should be one of float, list or numpy ndarray, "
+                         "but got {}".format(type(step_size))))
+    
+    if isinstance(step_size, list) or isinstance(step_size, np.ndarray):
+        warnings.warn(("The step_size you supplied in optalgo_params is a {}, "
+                       "and will be reset to be the smallest positive number therein.").format(type(step_size)))
+        step_size = np.array(step_size)
+        step_size = np.min(step_size[step_size > 0.])
+    
+    if step_size <= 0.:
+        raise ValueError("The step_size in optalgo_params must be strictly positive, but got {}.".format(step_size))
     
     if len(start_pt) != N * d + 1:
         raise ValueError(("The supplied start_pt in optalgo_params is not correct. "
@@ -738,7 +752,7 @@ def negloglik_smbasis_loss_function(data, new_data, kernel_function, base_densit
 
 def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
                                           lambda_cand, k_folds, print_error,
-                                          optalgo_params, batchmc_params_grad, batchmc_params_Af,
+                                          optalgo_params, batchmc_params,
                                           save_dir, save_info=False, batch_mc=True, batch_mc_se=False):
     
     """
@@ -772,15 +786,9 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
         The dictionary of parameters to control the gradient descent algorithm.
         Must be returned from the function negloglik_penalized_optalgoparams.
         
-    batchmc_params_grad : dict
+    batchmc_params : dict
         The dictionary of parameters to control the batch Monte Carlo method
         to approximate the log-partition function and its gradient.
-        Must be returned from the function batch_montecarlo_params.
-        
-    batchmc_params_Af : dict
-        The dictionary of parameters to control the batch Monte Carlo method
-        to approximate the log-partition function
-        when evaluating the negative log-likelihood loss function.
         Must be returned from the function batch_montecarlo_params.
     
     save_dir : str
@@ -818,6 +826,25 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
     N, d = data.shape
     # coef_len = N * d + 1
     n_lambda = len(lambda_cand)
+
+    # check the step size
+    step_size = optalgo_params['step_size']
+    if isinstance(step_size, float):
+    
+        warn_msg = ("The step_size in optalgo_params is a float, and will be used in computing "
+                    "density estimates for all {} different lambda values in lambda_cand."
+                    "It is better to supply a list or numpy.ndarray for step_size.").format(n_lambda)
+    
+        print(warn_msg)
+        
+        step_size = np.array([step_size] * n_lambda)
+        
+    elif isinstance(step_size, list):
+        
+        step_size = np.array(step_size)
+
+    if len(step_size) != n_lambda:
+        raise ValueError("The length of step_size in optalgo_params is not the same as that of lambda_cand.")
     
     # draw repeatedly from 0 to k_folds-1 of size N
     folds_i = np.random.randint(low=0, high=k_folds, size=N)
@@ -867,7 +894,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
             # compute the coefficient vector for the given lambda
             train_algo_control = negloglik_penalized_optalgoparams(
                 start_pt=np.zeros((train_data.shape[0] * train_data.shape[1] + 1, 1), dtype=np.float64),
-                step_size=optalgo_params["step_size"],
+                step_size=step_size[j],
                 max_iter=optalgo_params["max_iter"],
                 rel_tol=optalgo_params["rel_tol"])
             
@@ -877,7 +904,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
                 base_density=base_density,
                 lambda_param=lambda_param,
                 optalgo_params=train_algo_control,
-                batchmc_params=batchmc_params_grad,
+                batchmc_params=batchmc_params,
                 batch_mc=batch_mc,
                 batch_mc_se=batch_mc_se,
                 print_error=print_error)
@@ -885,10 +912,10 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
             score += negloglik_smbasis_loss_function(
                 data=train_data,
                 new_data=test_data,
-                kernel_function=kernel_function,
+                kernel_function=kernel_function_sub,
                 base_density=base_density,
                 coef=coef,
-                batchmc_params=batchmc_params_Af,
+                batchmc_params=batchmc_params,
                 batch_mc=batch_mc,
                 batch_mc_se=batch_mc_se)
             
@@ -904,19 +931,19 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
     
     # find the optimal penalty parameter
     opt_lambda = lambda_cand[np.argmin(nll_scores)]
-    print("-" * 50)
-    print("The optimal penalty parameter is " + str(opt_lambda) + ".")
-    
-    print("-" * 50 + "\nFinal run with the optimal lambda.")
+    print("=" * 50)
+    print("The optimal penalty parameter is {}.".format(opt_lambda))
+    print("=" * 50 + "\nFinal run with the optimal lambda.")
 
     # compute the coefficient vector at the optimal penalty parameter
+    optalgo_params['step_size'] = step_size[np.argmin(nll_scores)]
     opt_coef = negloglik_smbasis_coef(
         data=data,
         kernel_function=kernel_function,
         base_density=base_density,
         lambda_param=opt_lambda,
         optalgo_params=optalgo_params,
-        batchmc_params=batchmc_params_grad,
+        batchmc_params=batchmc_params,
         batch_mc=batch_mc,
         batch_mc_se=batch_mc_se,
         print_error=print_error)
