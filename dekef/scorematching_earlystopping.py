@@ -202,6 +202,10 @@ def scorematching_earlystopping_optiter(data, kernel_function, base_density, ite
 	
 	opt_iter = iternum_cand[np.argmin(sm_scores)]
 	
+	print("=" * 50)
+	print("The optimal number of iterations is {}.".format(opt_iter))
+	print("=" * 50 + "\nFinal run with the optimal number of iterations.")
+	
 	# compute the coefficient vector at the optimal regularization parameter
 	opt_coef = scorematching_earlystopping_coef(
 		data=data,
