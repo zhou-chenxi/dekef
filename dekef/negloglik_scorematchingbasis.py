@@ -1,4 +1,5 @@
 import warnings
+from check import *
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 
@@ -8,14 +9,14 @@ def negloglik_smbasis_grad_logpar_batchmc(data, kernel_function, base_density, c
     
     """
     Approximates the log-partition function, A, at coef and its gradient at coef using the basis functions in
-    the score matching density estimator. The method used is the batch Monte Carlo method.
+    the score matching density estimator. The approximation method used is the batch Monte Carlo method.
     Terminate the sampling process until the relative difference of two consecutive approximations is
     less than tol_param.
     
     Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
-    The log-partition function evaluated at coef can be approximated by
+    The log-partition function evaluated at coef is approximated by
     log ((1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) )),
-    and the gradient of the log-partition function evaluated at coef can be approximated by
+    and the gradient of the log-partition function evaluated at coef is approximated by
     (1 / M) sum_{j=1}^M phi_l (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A (coef)), for all l = 1, ..., N.
     
     Parameters
@@ -25,14 +26,14 @@ def negloglik_smbasis_grad_logpar_batchmc(data, kernel_function, base_density, c
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
-        The array of coefficients at which the log-partition function and its gradient are evaluated.
+        The array of coefficients at which the log-partition function and its gradient are approximated.
     
     batch_size : int
         The batch size in the batch Monte Carlo method.
@@ -41,10 +42,10 @@ def negloglik_smbasis_grad_logpar_batchmc(data, kernel_function, base_density, c
         The floating point number below which sampling in the batch Monte Carlo is terminated.
         The smaller the tol_param is, the more accurate the approximations are.
         
-    normalizing_const_only : bool
+    normalizing_const_only : bool, optional
         Whether to ONLY approximate the log-partition function but not its gradient; default is False.
     
-    print_error : bool
+    print_error : bool, optional
         Whether to print the error in the batch Monte Carlo method; default is False.
 
     Returns
@@ -193,14 +194,14 @@ def negloglik_smbasis_grad_logpar_batchmc_se(data, kernel_function, base_density
     
     """
     Approximates the log-partition function, A, at coef and its gradient at coef using the basis functions in
-    the score matching density estimator. The method used is the batch Monte Carlo method.
+    the score matching density estimator. The approximation method used is the batch Monte Carlo method.
     Terminate the sampling process until the standard deviation of the approximations is
     less than tol_param.
     
     Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
-    The log-partition function evaluated at coef can be approximated by
+    The log-partition function evaluated at coef is approximated by
     log ((1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) )),
-    and the gradient of the log-partition function evaluated at coef can be approximated by
+    and the gradient of the log-partition function evaluated at coef is approximated by
     (1 / M) sum_{j=1}^M phi_i (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A (coef)), for all i = 1, ..., N.
     
     Parameters
@@ -210,11 +211,11 @@ def negloglik_smbasis_grad_logpar_batchmc_se(data, kernel_function, base_density
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
         The array of coefficients at which the log-partition function and its gradient are evaluated.
@@ -226,10 +227,10 @@ def negloglik_smbasis_grad_logpar_batchmc_se(data, kernel_function, base_density
         The floating point number below which sampling in the batch Monte Carlo is terminated.
         The smaller the tol_param is, the more accurate the approximations are.
         
-    normalizing_const_only : bool
+    normalizing_const_only : bool, optional
         Whether to ONLY approximate the log-partition function but not its gradient; default is False.
     
-    print_error : bool
+    print_error : bool, optional
         Whether to print the error in the batch Monte Carlo method; default is False.
 
     Returns
@@ -396,7 +397,7 @@ def negloglik_penalized_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, re
         the penalized negative log-likelihood loss function.
     
     step_size : float or list or numpy.ndarray
-        The step size of the gradient descent algorithm; default is 0.01.
+        The step size used in the gradient descent algorithm; default is 0.01.
     
     max_iter : int
         The maximal number of iterations in the gradient descent algorithm; default is 100.
@@ -438,11 +439,11 @@ def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     lambda_param : float
         The penalty parameter. Must be non-negative.
@@ -458,7 +459,7 @@ def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
     
     batch_mc : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
-        being the accuracy of two consecutive approximations; default is True.
+        being the relative difference of two consecutive approximations; default is True.
     
     batch_mc_se : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
@@ -473,6 +474,10 @@ def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
         An array of coefficients for penalized negative log-likelihood density estimate.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     if lambda_param < 0.:
         raise ValueError("The lambda_param cannot be negative.")
@@ -661,11 +666,11 @@ def negloglik_smbasis_loss_function(data, new_data, kernel_function, base_densit
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
         The array of coefficients at which the log-partition function and its gradient are evaluated.
@@ -678,7 +683,7 @@ def negloglik_smbasis_loss_function(data, new_data, kernel_function, base_densit
     
     batch_mc : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
-        being the accuracy of two consecutive approximations; default is True.
+        being the relative difference of two consecutive approximations; default is True.
     
     batch_mc_se : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
@@ -767,11 +772,11 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     lambda_cand : list or 1-dimensional numpy.ndarray
         The list of penalty parameter candidates. Each of them must be non-negative.
@@ -801,7 +806,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
     
     batch_mc : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
-        being the accuracy of two consecutive approximations; default is True.
+        being the relative difference of two consecutive approximations; default is True.
     
     batch_mc_se : bool, optional
         Whether to use the batch Monte Carlo method with the termination criterion
@@ -814,6 +819,10 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
         opt_coef, the coefficient vector at the optimal penalty parameter.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
