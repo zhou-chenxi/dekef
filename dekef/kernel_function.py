@@ -16,13 +16,14 @@ class KernelFunction:
     
     @staticmethod
     def __type__():
+        
         return 'kernel_function'
         
 
 class GaussianPoly2(KernelFunction):
 
     """
-    This is a class of the Gaussian kernel function plus a polynomial kernel function of degree 2,
+    This is a class of a Gaussian kernel function plus a polynomial kernel function of degree 2,
     k (x, y) = r1 * exp (- || x - y || ^ 2 / (2 * bw ^ 2)) + r2 * (x^\top y + c) ^ 2.
 
     ...
@@ -39,16 +40,16 @@ class GaussianPoly2(KernelFunction):
         The number of columns in of data.
         
     r1 : float
-        The coefficient associated with the Gaussian kernel function.
+        The multiplicative coefficient associated with the Gaussian kernel function.
         
     r2 : float
-        The coefficient associated with the polynomial kernel function of degree 2.
+        The multiplicative coefficient associated with the polynomial kernel function of degree 2.
         
     c : float
-        The non-homogenous additive coefficient in the polynomial kernel function of degree 2.
+        The non-homogenous additive constant in the polynomial kernel function of degree 2.
         
     bw : float
-        The bandwidth coefficient in the Gaussian kernel function.
+        The bandwidth parameter in the Gaussian kernel function.
         
     kernel_type : str
         The type of the kernel function, 'gaussian_poly2'.
@@ -89,8 +90,8 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d} k (X_i, Y_j),
-        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         the other is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
@@ -98,8 +99,8 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d} k (X_i, Y_j),
-        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         one partial derivative is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
@@ -107,8 +108,8 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
@@ -116,55 +117,46 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
     kernel_x_1d(landmark)
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points,
-        i.e., landmark and y are real numbers.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
     kernel_x_1d_deriv1(landmark)
-        Returns a function that computes partial_1 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
     kernel_x_1d_deriv2(landmark)
-        Returns a function that computes partial_1^2 k (x, landmark), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
+        Returns a function that computes partial_1^2 k (x, landmark) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
     kernel_x_2d(landmark)
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points,
-        i.e., landmark and y belong to R^2.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv1_0(landmark)
-        Returns a function that computes partial_1 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv1_1(landmark)
-        Returns a function that computes partial_2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv2_0(landmark)
-        Returns a function that computes partial_1^2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_1^2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv2_1(landmark)
-        Returns a function that computes partial_2^2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_2^2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_3d(landmark)
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points,
-        i.e., landmark and y belong to R^3.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points.
 
     """
 
@@ -177,16 +169,16 @@ class GaussianPoly2(KernelFunction):
             The array of observations whose density function is to be estimated.
 
         r1 : float
-            The coefficient associated with the Gaussian kernel function.
+            The multiplicative coefficient associated with the Gaussian kernel function.
 
         r2 : float
-            The coefficient associated with the polynomial kernel function of degree 2.
+            The multiplicative coefficient associated with the polynomial kernel function of degree 2.
 
         c : float
-            The non-homogenous additive coefficient in the polynomial kernel function of degree 2.
+            The non-homogenous additive constant in the polynomial kernel function of degree 2.
 
         bw : float
-            The bandwidth coefficient in the Gaussian kernel function.
+            The bandwidth parameter in the Gaussian kernel function.
             
         """
         
@@ -214,7 +206,7 @@ class GaussianPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which the Gaussian kernel function is to be evaluated.
 
         Returns
         -------
@@ -252,7 +244,7 @@ class GaussianPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -288,7 +280,8 @@ class GaussianPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which the Gaussian kernel function plus the polynomial kernel function
+            of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -318,7 +311,8 @@ class GaussianPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which first partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
         
         Returns
         -------
@@ -362,7 +356,8 @@ class GaussianPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which second partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -400,15 +395,16 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d} k (X_i, Y_j),
-        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         the other is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
         
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which second mixed partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -463,15 +459,16 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d} k (X_i, Y_j),
-        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         one partial derivative is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
         
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which third mixed partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -524,15 +521,16 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which third mixed partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -585,15 +583,16 @@ class GaussianPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the Gaussian kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which fourth mixed partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -640,9 +639,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_1d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points,
-        i.e., landmark and y are real numbers.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
         
         Parameters
         ----------
@@ -652,7 +650,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
         
         """
 
@@ -671,9 +669,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_1d_deriv1(self, landmark):
         
         """
-        Returns a function that computes partial_1 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
         Parameters
         ----------
@@ -683,7 +680,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1 k (landmark, y).
+            A function that computes partial_1 k (landmark, y) at y.
             
         """
 
@@ -704,9 +701,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_1d_deriv2(self, landmark):
         
         """
-        Returns a function that computes partial_1^2 k (x, landmark), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points,
-        i.e., landmark and y are real numbers.
+        Returns a function that computes partial_1^2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
         Parameters
         ----------
@@ -716,7 +712,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1^2 k (landmark, y).
+            A function that computes partial_1^2 k (landmark, y) at y.
         
         """
         
@@ -739,9 +735,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_2d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points,
-        i.e., landmark and y belong to R^2.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -751,7 +746,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
             
         """
 
@@ -769,9 +764,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_2d_deriv1_0(self, landmark):
         
         """
-        Returns a function that computes partial_1 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
     
         Parameters
         ----------
@@ -781,7 +775,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1 k (landmark, y).
+            A function that computes partial_1 k (landmark, y) at y.
             
         """
         
@@ -802,9 +796,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_2d_deriv1_1(self, landmark):
     
         """
-        Returns a function that computes partial_2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -814,7 +807,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_2 k (landmark, y).
+            A function that computes partial_2 k (landmark, y) at y.
         
         """
         
@@ -835,9 +828,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_2d_deriv2_0(self, landmark):
         
         """
-        Returns a function that computes partial_1^2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_1^2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -847,7 +839,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1^2 k (landmark, y).
+            A function that computes partial_1^2 k (landmark, y) at y.
             
         """
     
@@ -869,9 +861,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_2d_deriv2_1(self, landmark):
         
         """
-        Returns a function that computes partial_2^2 k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_2^2 k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -881,7 +872,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_2^2 k (landmark, y).
+            A function that computes partial_2^2 k (landmark, y) at y.
         
         """
         
@@ -903,9 +894,8 @@ class GaussianPoly2(KernelFunction):
     def kernel_x_3d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the Gaussian kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points,
-        i.e., landmark and y belong to R^3.
+        Returns a function that computes k (landmark, y) at y, where k is the Gaussian kernel function
+        plus the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points.
 
         Parameters
         ----------
@@ -915,7 +905,7 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
             
         """
     
@@ -933,8 +923,9 @@ class GaussianPoly2(KernelFunction):
 
 
 class RationalQuadPoly2(KernelFunction):
+    
     """
-    This is a class of the rational quadratic kernel function plus a polynomial kernel function of degree 2,
+    This is a class of a rational quadratic kernel function plus a polynomial kernel function of degree 2,
     k (x, y) = r1 * (1 + (||x - y|| ^ 2 / (2 * bw ^ 2))) ^ (-1) + r2 * (x^\top y + c) ^ 2.
 
     ...
@@ -951,20 +942,20 @@ class RationalQuadPoly2(KernelFunction):
         The number of columns of data.
         
     r1 : float
-        The coefficient associated with the rational quadratic kernel function.
+        The multiplicative coefficient associated with the rational quadratic kernel function.
         
     r2 : float
-        The coefficient associated with the polynomial kernel function of degree 2.
+        The multiplicative coefficient associated with the polynomial kernel function of degree 2.
         
     c : float
-        The non-homogenous additive coefficient in the polynomial kernel function of degree 2.
+        The non-homogenous additive constant in the polynomial kernel function of degree 2.
         
     bw : float
-        The bandwidth coefficient in the rational quadratic kernel function.
+        The bandwidth parameter in the rational quadratic kernel function.
         
     kernel_type : str
         The type of the kernel function, 'rationalquad_poly2'.
-
+        
     Methods
     -------
     rationalquad_kernel_gram_matrix(new_data)
@@ -1001,8 +992,8 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d} k (X_i, Y_j),
-        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         the other is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
     
@@ -1010,8 +1001,8 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d} k (X_i, Y_j),
-        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         one partial derivative is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
     
@@ -1019,8 +1010,8 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
     
@@ -1028,55 +1019,46 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
     kernel_x_1d(landmark)
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points,
-        i.e., landmark and y are real numbers.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
     kernel_x_1d_deriv1(landmark)
-        Returns a function that computes partial_1 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
-
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
+        
     kernel_x_1d_deriv2(landmark)
-        Returns a function that computes partial_1^2 k (x, landmark), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
-
+        Returns a function that computes partial_1^2 k (x, landmark) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
+        
     kernel_x_2d(landmark)
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points,
-        i.e., landmark and y belong to R^2.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv1_0(landmark)
-        Returns a function that computes partial_1 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
     kernel_x_2d_deriv1_1(landmark)
-        Returns a function that computes partial_2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
     kernel_x_2d_deriv2_0(landmark)
-        Returns a function that computes partial_1^2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_1^2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
     kernel_x_2d_deriv2_1(landmark)
-        Returns a function that computes partial_2^2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_2^2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
     kernel_x_3d(landmark)
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points,
-        i.e., landmark and y belong to R^3.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points.
 
     """
     
@@ -1089,16 +1071,17 @@ class RationalQuadPoly2(KernelFunction):
             The array of observations whose density function is to be estimated.
 
         r1 : float
-            The coefficient associated with the Gaussian kernel function.
+            The multiplicative coefficient associated with the rational quadratic kernel function.
 
         r2 : float
-            The coefficient associated with the polynomial kernel function of degree 2.
+            The multiplicative coefficient associated with the polynomial kernel function of degree 2.
 
         c : float
-            The non-homogenous additive coefficient in the polynomial kernel function of degree 2.
+            The non-homogenous additive constant in the polynomial kernel function of degree 2.
 
         bw : float
-            The bandwidth coefficient in the Gaussian kernel function.
+            The bandwidth parameter in the rational quadratic kernel function.
+
         """
 
         super().__init__()
@@ -1125,7 +1108,7 @@ class RationalQuadPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which the rational quadratic kernel function is to be evaluated.
 
         Returns
         -------
@@ -1165,8 +1148,8 @@ class RationalQuadPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
-
+            A new data array at which the polynomial kernel function of degree 2 is to be evaluated.
+            
         Returns
         -------
         numpy.ndarray
@@ -1201,7 +1184,8 @@ class RationalQuadPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1231,7 +1215,8 @@ class RationalQuadPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which first partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1274,7 +1259,8 @@ class RationalQuadPoly2(KernelFunction):
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which second partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1312,15 +1298,16 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d} k (X_i, Y_j),
-        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d} k denotes the second mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         the other is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which second mixed partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1375,15 +1362,16 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d} k (X_i, Y_j),
-        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d} k denotes the third mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         one partial derivative is taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which third mixed partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1437,15 +1425,16 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k, where
-        one partial derivative is taken with respect to the u-th coordinate of the first argument and
+        where partial_u partial_{v+d}^2 k denotes the third mixed partial derivative of k,
+        one partial derivative is taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which third mixed partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1499,15 +1488,16 @@ class RationalQuadPoly2(KernelFunction):
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
         the rational quadratic kernel function plus the polynomial kernel function of degree 2,
         with the ((i-1)*d+u, (j-1)*d+v)-th entry being partial_u^2 partial_{v+d}^2 k (X_i, Y_j),
-        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k, where
-        two partial derivatives are taken with respect to the u-th coordinate of the first argument and
+        where partial_u^2 partial_{v+d}^2 k denotes the fourth mixed partial derivative of k,
+        two partial derivatives are taken with respect to the u-th coordinate of the first argument,
         two partial derivatives are taken with respect to the v-th coordinate of the second argument,
         X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
         Parameters
         ----------
         new_data : numpy.ndarray
-            An data array of the same number of columns as data.
+            A new data array at which fourth mixed partial of the rational quadratic kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
 
         Returns
         -------
@@ -1553,9 +1543,8 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_1d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points,
-        i.e., landmark and y are real numbers.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
 
         Parameters
         ----------
@@ -1565,7 +1554,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
         """
         
         landmark = np.array(landmark).flatten()
@@ -1582,10 +1571,9 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_1d_deriv1(self, landmark):
         
         """
-        Returns a function that computes partial_1 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
-
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
+        
         Parameters
         ----------
         landmark : float or np.ndarray
@@ -1594,7 +1582,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1 k (landmark, y).
+            A function that computes partial_1 k (landmark, y) at y.
 
         """
         
@@ -1614,10 +1602,9 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_1d_deriv2(self, landmark):
         
         """
-        Returns a function that computes partial_1^2 k (x, landmark), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional
-        data points, i.e., landmark and y are real numbers.
-
+        Returns a function that computes partial_1^2 k (x, landmark) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 1-dimensional data points.
+        
         Parameters
         ----------
         landmark : float or np.ndarray
@@ -1626,7 +1613,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1^2 k (landmark, y).
+            A function that computes partial_1^2 k (landmark, y) at y.
 
         """
         
@@ -1648,9 +1635,8 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_2d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points,
-        i.e., landmark and y belong to R^2.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -1660,7 +1646,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
 
         """
         
@@ -1678,10 +1664,9 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_2d_deriv1_0(self, landmark):
         
         """
-        Returns a function that computes partial_1 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_1 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
         Parameters
         ----------
         landmark : np.ndarray
@@ -1690,7 +1675,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1 k (landmark, y).
+            A function that computes partial_1 k (landmark, y) at y.
 
         """
         
@@ -1709,10 +1694,9 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_2d_deriv1_1(self, landmark):
         
         """
-        Returns a function that computes partial_2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
         Parameters
         ----------
         landmark : np.ndarray
@@ -1721,7 +1705,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_2 k (landmark, y).
+            A function that computes partial_2 k (landmark, y) at y.
 
         """
         
@@ -1741,10 +1725,9 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_2d_deriv2_0(self, landmark):
         
         """
-        Returns a function that computes partial_1^2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
-
+        Returns a function that computes partial_1^2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
+        
         Parameters
         ----------
         landmark : np.ndarray
@@ -1753,7 +1736,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_1^2 k (landmark, y).
+            A function that computes partial_1^2 k (landmark, y) at y.
 
         """
         
@@ -1774,9 +1757,8 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_2d_deriv2_1(self, landmark):
         
         """
-        Returns a function that computes partial_2^2 k (landmark, y), where k is the rational quadratic kernel function
-        plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional
-        data points, i.e., landmark and y belong to R^2.
+        Returns a function that computes partial_2^2 k (landmark, y) at y, where k is the rational quadratic kernel
+        function plus the polynomial kernel function of degree 2, both landmark and y are 2-dimensional data points.
 
         Parameters
         ----------
@@ -1786,7 +1768,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes partial_2^2 k (landmark, y).
+            A function that computes partial_2^2 k (landmark, y) at y.
 
         """
         
@@ -1807,9 +1789,8 @@ class RationalQuadPoly2(KernelFunction):
     def kernel_x_3d(self, landmark):
         
         """
-        Returns a function that computes k (landmark, y), where k is the rational quadratic kernel function plus
-        the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points,
-        i.e., landmark and y belong to R^3.
+        Returns a function that computes k (landmark, y) at y, where k is the rational quadratic kernel function plus
+        the polynomial kernel function of degree 2, both landmark and y are 3-dimensional data points.
 
         Parameters
         ----------
@@ -1819,7 +1800,7 @@ class RationalQuadPoly2(KernelFunction):
         Returns
         -------
         function
-            A function that computes k (landmark, y).
+            A function that computes k (landmark, y) at y.
 
         """
         
