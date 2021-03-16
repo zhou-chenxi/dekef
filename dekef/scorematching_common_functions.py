@@ -1,4 +1,5 @@
 import numpy as np
+from check import *
 
 
 def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
@@ -21,11 +22,11 @@ def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
         
     Returns
     -------
@@ -34,6 +35,10 @@ def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
         See the description above for details.
         
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     # ------------------------------------------------------------------------------
     # evaluate hat{z}
@@ -63,10 +68,12 @@ def sq_rkhs_norm_matrix(data, kernel_function, base_density):
     
     """
     Returns the Gram matrix of shape (data.shape[0] * data.shape[1] + 1, data.shape[0] * data.shape[0] + 1) to
-    compute the squared RKHS norm of the natural parameter. It can be decomposed as the following block matrix
-        A      |            h
+    compute the squared RKHS norm of the natural parameter. It can be decomposed as the following blocked matrix
+    
+        A    |            h
         ---------------------------------
         h^T | ||z||_{mathcal{H}}^2
+    
     where
     - A is a matrix of shape (data.shape[0] * data.shape[1], data.shape[0] * data.shape[1]) with
     the ((i-1)*d+u, (i-1)*d+u)-th entry being partial_u partial_{v+d} k (X_i, X_j),
@@ -81,11 +88,11 @@ def sq_rkhs_norm_matrix(data, kernel_function, base_density):
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
         
     Returns
     -------
@@ -94,6 +101,10 @@ def sq_rkhs_norm_matrix(data, kernel_function, base_density):
         See the description above for details.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     # entries are \partial_u \partial_v k(X_i, X_j)
     kernel_partial_11 = kernel_function.partial_kernel_matrix_11(new_data=data)
@@ -139,11 +150,11 @@ def vector_h(data, kernel_function, base_density):
         
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
         
     Returns
     -------
@@ -152,6 +163,10 @@ def vector_h(data, kernel_function, base_density):
         See the description above for details.
     
     """
+    
+    check_kernelfunction(kernel_function)
+    check_basedensity(base_density)
+    check_samedata(kernel_function, base_density)
     
     # entries are \partial_u \partial_v k(X_i, X_j)
     kernel_partial_11 = kernel_function.partial_kernel_matrix_11(new_data=data)
