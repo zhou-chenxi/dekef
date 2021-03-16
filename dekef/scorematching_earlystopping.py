@@ -1,6 +1,7 @@
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 from dekef.scorematching_loss_function import *
+from check import *
 
 
 def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_num, step_size, threshold=1e-8):
@@ -16,11 +17,11 @@ def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_n
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	iter_num : int, float
 		The number of iterations in the gradient descent algorithm.
@@ -35,9 +36,13 @@ def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_n
 	Returns
 	-------
 	numpy.ndarray
-		An array of coefficients for the early stopping score matching density estimate.
+		An array of coefficients of basis functions in the early stopping score matching density estimate.
 	
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	N, d = data.shape
 	
@@ -73,7 +78,8 @@ def scorematching_earlystopping_optiter(data, kernel_function, base_density, ite
 	
 	"""
 	Selects the optimal number of iterations in the early stopping score matching density estimation
-	using k-fold cross validation and computes the coefficient vector at this optimal number of iterations.
+	using k-fold cross validation and computes the coefficient vector of basis functions
+	at this optimal number of iterations.
 	
 	Parameters
 	----------
@@ -82,11 +88,11 @@ def scorematching_earlystopping_optiter(data, kernel_function, base_density, ite
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	iternum_cand : list or 1-dimensional numpy.ndarray
 		The list of numbers of iterations candidates.
@@ -113,9 +119,14 @@ def scorematching_earlystopping_optiter(data, kernel_function, base_density, ite
 	-------
 	dict
 		A dictionary containing opt_lambda, the optimal number of iterations, and
-		opt_coef, the coefficient vector at the optimal number of iterations.
+		opt_coef, the coefficient vector of basis functions in the early stopping score matching density estimate
+		at the optimal number of iterations.
 	
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
