@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
 from dekef.unnormalized_density import *
@@ -6,7 +5,7 @@ import sys
 
 
 def plot_density_1d(data, kernel_function, base_density, coef, normalizing, method, x_label,
-                    save_plot, save_dir, save_filename, plot_kwargs):
+                    plot_kwargs, save_plot=False, save_dir=None, save_filename=None):
 
     """
     Makes the plot of the density estimate with the histogram over a bounded one-dimensional interval.
@@ -35,17 +34,6 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
     
     x_label : str
         The label of the horizontal axis.
-    
-    save_plot : bool
-        Whether to save the plot of the density estimate as a local file.
-    
-    save_dir : str
-        The directory path to which the plot of the density estimate is saved;
-        only works when save_plot is set to be True.
-    
-    save_filename : str
-        The file name for the plot of the density estimate saved as a local file;
-        only works when save_plot is set to be True.
     
     plot_kwargs : dict
         The dict containing parameters for plotting the density estimate, including
@@ -80,6 +68,17 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
         
         font_size : int
             The font size in the plot.
+    
+    save_plot : bool, optional
+        Whether to save the plot of the density estimate as a local file; default is False.
+    
+    save_dir : str, optional
+        The directory path to which the plot of the density estimate is saved;
+        only works when save_plot is set to be True. Default is None.
+    
+    save_filename : str, optional
+        The file name for the plot of the density estimate saved as a local file;
+        only works when save_plot is set to be True. Default is None.
         
     Returns
     -------
@@ -158,7 +157,10 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
     
     ax.set_title('Density Plot (' + method + ')', fontsize=plot_kwargs['fontsize'])
     ax.set_xlabel(x_label, fontsize=plot_kwargs['fontsize'])
-    ax.set_ylabel('density', fontsize=plot_kwargs['fontsize'])
+    if normalizing:
+        ax.set_ylabel('density', fontsize=plot_kwargs['fontsize'])
+    else:
+        ax.set_ylabel('unnormalized density', fontsize=plot_kwargs['fontsize'])
     ax.set_xlim(plot_kwargs['x_limit'])
     ax.set_ylim(plot_kwargs['y_limit'])
     ax.tick_params(axis='both', labelsize=plot_kwargs['fontsize'])
@@ -368,10 +370,14 @@ def plot_density_1d_scorematchingbasis_updated(data, kernel_function, base_densi
     # plt.plot(data, [0.01] * len(data), '|', color = 'k')
     
     ax.set_title('Density Plot (' + method + ')', fontsize=plot_kwargs['fontsize'])
-    ax.set_xlabel(x_label)
-    ax.set_ylabel('density')
+    ax.set_xlabel(x_label, fontsize=plot_kwargs['fontsize'])
+    if normalizing:
+        ax.set_ylabel('density', fontsize=plot_kwargs['fontsize'])
+    else:
+        ax.set_ylabel('unnormalized density', fontsize=plot_kwargs['fontsize'])
     ax.set_xlim(plot_kwargs['x_limit'])
     ax.set_ylim(plot_kwargs['y_limit'])
+    ax.tick_params(axis='both', labelsize=plot_kwargs['fontsize'])
     if save_plot:
         plt.savefig(save_dir + save_filename + '.pdf')
     plt.show()
