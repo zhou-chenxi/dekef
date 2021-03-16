@@ -185,6 +185,10 @@ def scorematching_penalized_optlambda(data, kernel_function, base_density, lambd
     
     # find the optimal regularization parameter
     opt_lambda = lambda_cand[np.argmin(sm_scores)]
+
+    print("=" * 50)
+    print("The optimal penalty parameter is {}.".format(opt_lambda))
+    print("=" * 50 + "\nFinal run with the optimal lambda.")
     
     opt_coef = scorematching_penalized_coef(
         data=data,
