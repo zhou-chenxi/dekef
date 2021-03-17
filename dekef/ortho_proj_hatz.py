@@ -1,4 +1,5 @@
 import numpy as np
+from check import *
 
 
 def hatz(data, new_data, kernel_function, base_density):
@@ -6,7 +7,7 @@ def hatz(data, new_data, kernel_function, base_density):
 	"""
 	Evaluates hat{z} at new_data, where
 	hat{z} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v^2 k (X_j, .) + partial_v log mu (X_j) partial_v^2 k (X_j, .)),
-	where N = data.shape[0], d = data.shape[1], mu is the base density, X_j is the j-th row of data.
+	N = data.shape[0], d = data.shape[1], mu is the base density, X_j is the j-th row of data.
 	
 	Parameters
 	----------
@@ -18,11 +19,11 @@ def hatz(data, new_data, kernel_function, base_density):
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	Returns
 	-------
@@ -30,6 +31,10 @@ def hatz(data, new_data, kernel_function, base_density):
 		A 1-dimensional array of hat{z} evaluated at new_data.
 	
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -58,7 +63,7 @@ def hatz(data, new_data, kernel_function, base_density):
 def innerp_hatz_partial_kernel(data, kernel_function, base_density):
 	
 	"""
-	Evaluates the inner product between hat{z} and partial_u k (X_i, .), where is equal to
+	Evaluates the inner product between hat{z} and partial_u k (X_i, .), which is equal to
 	(1 / N) sum_{j=1}^N sum_{v=1}^d (partial_u partial_v^2 k (X_i, X_j) +
 	partial_v log mu (X_j) partial_u partial_v k (X_i, X_j)).
 	Here,
@@ -72,11 +77,11 @@ def innerp_hatz_partial_kernel(data, kernel_function, base_density):
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	Returns
 	-------
@@ -86,6 +91,10 @@ def innerp_hatz_partial_kernel(data, kernel_function, base_density):
 		for i = 1, ..., data.shape[0], u = 1, ...,, data.shape[1].
 		
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -109,8 +118,8 @@ def hatz_projection_C(data, new_data, kernel_function, base_density):
 	"""
 	Evaluates the orthogonal projection of hat{z} onto the range of hat{C} at new_data, where
 	hat{z} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v^2 k (X_j, .) + partial_v log mu (X_j) partial_v k (X_j, .)),
-	and hat{C} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v k (X_j, .) otimes partial_v k (X_j, .)),
-	where N = data.shape[0], d = data.shape[1], mu is the base density, X_j is the j-th row of data.
+	hat{C} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v k (X_j, .) otimes partial_v k (X_j, .)),
+	N = data.shape[0], d = data.shape[1], mu is the base density, and X_j is the j-th row of data.
 	
 	To compute the orthogonal projection of hat{z} onto the range of hat{C}, we solve
 	the following minimization problem
@@ -126,19 +135,23 @@ def hatz_projection_C(data, new_data, kernel_function, base_density):
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	Returns
 	-------
 	numpy.ndarray
-		An array of shape (new_data.shape[0],) of values of the orthogonal projection of hat{z}
-		onto the range of hat{C} at new_data.
+		An array of shape (new_data.shape[0],) of the orthogonal projection of hat{z}
+		onto the range of hat{C} evaluated at new_data.
 	
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -166,11 +179,10 @@ def hatz_projection_C(data, new_data, kernel_function, base_density):
 def hatz_projection_C_perp(data, new_data, kernel_function, base_density):
 	
 	"""
-	Evaluates the orthogonal projection of hat{z} onto the orthogonal complement of the range of hat{C}
-	at new_data, where
+	Evaluates the orthogonal projection of hat{z} onto the null space of hat{C} at new_data, where
 	hat{z} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v^2 k (X_j, .) + partial_v log mu (X_j) partial_v k (X_j, .)),
-	and hat{C} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v k (X_j, .) otimes partial_v k (X_j, .)),
-	where N = data.shape[0], d = data.shape[1], mu is the base density, X_j is the j-th row of data.
+	hat{C} = (1 / N) sum_{j=1}^N sum_{v=1}^d (partial_v k (X_j, .) otimes partial_v k (X_j, .)),
+	N = data.shape[0], d = data.shape[1], mu is the base density, and X_j is the j-th row of data.
 	
 	Parameters
 	----------
@@ -193,9 +205,13 @@ def hatz_projection_C_perp(data, new_data, kernel_function, base_density):
 	-------
 	numpy.ndarray
 		An array of shape (new_data.shape[0],) of values of the orthogonal projection of hat{z}
-		onto the orthogonal complement of the range of hat{C} at new_data.
+		onto the null space of hat{C} at new_data.
 
 	"""
+	
+	check_kernelfunction(kernel_function)
+	check_basedensity(base_density)
+	check_samedata(kernel_function, base_density)
 	
 	# compute hat{z}
 	hatz_newdata = hatz(
