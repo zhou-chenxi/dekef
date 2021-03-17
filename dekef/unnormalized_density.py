@@ -1,5 +1,5 @@
 from dekef.scorematching_common_functions import *
-from check import *
+from dekef.check import *
 
 
 class UnnormalizedDensity:
@@ -97,7 +97,6 @@ class UnnormalizedDensity:
 
         check_kernelfunction(kernel_function)
         check_basedensity(base_density)
-        check_samedata(kernel_function, base_density)
 
         self.data = data
         self.kernel_function = kernel_function
