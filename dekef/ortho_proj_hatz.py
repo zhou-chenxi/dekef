@@ -1,5 +1,5 @@
 import numpy as np
-from check import *
+from dekef.check import *
 
 
 def hatz(data, new_data, kernel_function, base_density):
@@ -34,7 +34,6 @@ def hatz(data, new_data, kernel_function, base_density):
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -94,7 +93,6 @@ def innerp_hatz_partial_kernel(data, kernel_function, base_density):
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -151,7 +149,6 @@ def hatz_projection_C(data, new_data, kernel_function, base_density):
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
@@ -211,7 +208,6 @@ def hatz_projection_C_perp(data, new_data, kernel_function, base_density):
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	# compute hat{z}
 	hatz_newdata = hatz(
