@@ -1,5 +1,5 @@
 import warnings
-from check import *
+from dekef.check import *
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 
@@ -477,7 +477,6 @@ def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     if lambda_param < 0.:
         raise ValueError("The lambda_param cannot be negative.")
@@ -822,7 +821,6 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
