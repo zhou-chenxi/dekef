@@ -1,5 +1,5 @@
 import numpy as np
-from check import *
+from dekef.check import *
 
 
 def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
@@ -38,7 +38,6 @@ def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     # ------------------------------------------------------------------------------
     # evaluate hat{z}
@@ -104,7 +103,6 @@ def sq_rkhs_norm_matrix(data, kernel_function, base_density):
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     # entries are \partial_u \partial_v k(X_i, X_j)
     kernel_partial_11 = kernel_function.partial_kernel_matrix_11(new_data=data)
@@ -166,7 +164,6 @@ def vector_h(data, kernel_function, base_density):
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     # entries are \partial_u \partial_v k(X_i, X_j)
     kernel_partial_11 = kernel_function.partial_kernel_matrix_11(new_data=data)
