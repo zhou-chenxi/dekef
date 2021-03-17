@@ -1,6 +1,42 @@
 import matplotlib.pyplot as plt
 from scipy import integrate
 from dekef.unnormalized_density import *
+from check import *
+
+
+def plot_contour_2d_params(plot_domain, plot_pts_cnt=500, filled_contour=False, figsize=(10, 10), font_size=20):
+	"""
+	Specifies and returns the plotting parameters used in the function plot_contour_2d.
+	
+	Parameters
+	----------
+	plot_domain : list or numpy.ndarray
+		The list or numpy.ndarray to specify the domain of the contour plot of the density estimate.
+		Must be a list of length 2 with each component of length 2, or a numpy.ndarray of shape (2, 2).
+		All components must be finite numbers.
+	
+	plot_pts_cnt : int, optional
+		The number of points to be evaluated along each coordinate of plot_domain to make a contour plot
+		of the density estimate; default is 500.
+	
+	filled_contour : bool, optional
+		Whether to fill the contour plot of the density estimate; default is False.
+		
+	figsize : typle, optional
+		The size of the contour plot of the density estimate; default is (10, 10).
+	
+	font_size : int, optional
+		The font size in the plot; default is 20.
+	
+	"""
+	
+	output = {'plot_domain': plot_domain,
+              'plot_pts_cnt': plot_pts_cnt,
+			  'filled_contour': filled_contour,
+              'figsize': figsize,
+              'font_size': font_size}
+	
+	return output
 
 
 def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, method,
@@ -15,55 +51,38 @@ def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, meth
 	
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'kernel_function'.
+		__type__ must be 'kernel_function'.
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		Must be instantiated from the classes with __type__ being 'base_density'.
+		__type__ must be 'base_density'.
 	
 	coef : numpy.ndarray
 		The array of coefficients for basis functions in the natural parameter in the estimated density function.
-		
-    normalizing : bool
-        Whether to plot the contours of the normalized density estimate.
-    
-    method : str
-        The density estimation method.
-    
-    x_label : str
-        The label of the horizontal axis.
-    
-    y_label : str
-        The label of the vertical axis.
-    
-    save_plot : bool, optional
-        Whether to save the contour plot of the density estimate as a local file; default is False.
-    
-    save_dir : str, optional
-        The directory path to which the contour plot of the density estimate is saved;
-        only works when save_plot is set to be True; default is None.
-        
-    plot_kwargs : dict
-        The dict containing parameters for plotting the density estimate, including
-        filled_contour : bool, optional
-        	Whether to fill the contour plot of the density estimate; default is False.
-        
-        plot_domain : list or numpy.ndarray
-	        The list or numpy.ndarray to specify the domain of the contour plot of the density estimate.
-    	    Must be a list of length 2 with each component of length 2, or a numpy.ndarray of shape (2, 2).
-        	All components must be finite numbers.
-
-        plot_pts_cnt : int, optional
-	        The number of points to be evaluated along each coordinate of plot_domain to make a contour plot
-    	    of the density estimate; default is 500.
-        
-    	figsize : typle, optional
-        	The size of the contour plot of the density estimate.
-        
-        font_size : int
-            The font size in the plot.
-            
-    """
+	
+	normalizing : bool
+		Whether to plot the contours of the normalized density estimate.
+	
+	method : str
+		The density estimation method.
+	
+	x_label : str
+		The label of the horizontal axis.
+	
+	y_label : str
+		The label of the vertical axis.
+	
+	save_plot : bool, optional
+		Whether to save the contour plot of the density estimate as a local file; default is False.
+	
+	save_dir : str, optional
+		The directory path to which the contour plot of the density estimate is saved;
+		only works when save_plot is set to be True; default is None.
+	
+	plot_kwargs : dict
+		The dict containing plotting parameters returned from the function plot_contour_2d_params.
+	
+	"""
 	
 	# check the data is of 2 columns
 	if len(data.shape) != 2:

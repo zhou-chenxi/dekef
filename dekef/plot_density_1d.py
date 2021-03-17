@@ -2,13 +2,75 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from dekef.unnormalized_density import *
 import sys
+from check import *
+
+
+def plot_density_1d_params(x_limit, y_limit, plot_pts_cnt=2000, figsize=(10, 10),
+                           den_color='tab:blue', hist_color='tab:blue', bins='fd', his_alpha=0.5, font_size=20):
+    
+    """
+    Specifies and returns the plotting parameters used in the function plot_density_1d.
+    
+    Parameters
+    ----------
+    x_limit : tuple
+        The tuple to specify the plotting domain of the density estimate.
+        Must be of length 2. Both components must be finite numbers.
+            
+    y_limit : tuple
+        The tuple to specify the domain of the plot of density estimate in the vertical axis.
+        Must be of length 2. Both components must be finite numbers.
+        
+    plot_pts_cnt : int, optional
+        The number of points to be evaluated along the plot_domain to make a plot of density estimate;
+        default is 2000.
+        
+    figsize : typle, optional
+        The size of the plot of density estimate; default is (10, 10).
+            
+    den_color : str or tuple, optional
+        The color for plotting the density estimate; default is 'tab:blue'.
+        See details at https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
+        
+    hist_color : str or tuple, optional
+        The color for plotting the histogram; default is 'tab:blue'.
+        See details at https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
+        
+    bins : int or sequence or str, optional
+        The bins used for plotting the histogram; default is 'fd', the Freedman–Diaconis rule.
+        See details at https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html.
+        
+    hist_alpha : float, optional
+        Set the alpha value used for blending in plotting the histogram; default is 0.5.
+        
+    font_size : int, optional
+        The font size in the plot; default is 20.
+            
+    Returns
+    -------
+    dict
+        A dict containing all the plotting parameter inputs.
+            
+    """
+    
+    output = {'x_limit': x_limit,
+              'y_limit': y_limit,
+              'plot_pts_cnt': plot_pts_cnt,
+              'figsize': figsize,
+              'den_color': den_color,
+              'hist_color': hist_color,
+              'bins': bins,
+              'his_alpha': his_alpha,
+              'font_size': font_size}
+    
+    return output
 
 
 def plot_density_1d(data, kernel_function, base_density, coef, normalizing, method, x_label,
                     plot_kwargs, save_plot=False, save_dir=None, save_filename=None):
 
     """
-    Makes the plot of the density estimate with the histogram over a bounded one-dimensional interval.
+    Plots the density estimate with the histogram over a bounded one-dimensional interval.
     
     Parameters
     ----------
@@ -17,14 +79,14 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
 
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
-        The array of coefficients for basis functions in the natural parameter in the estimated density function.
+        The array of coefficients of basis functions in the estimated density function.
         
     normalizing : bool
         Whether to plot the normalized density estimate.
@@ -36,38 +98,7 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
         The label of the horizontal axis.
     
     plot_kwargs : dict
-        The dict containing parameters for plotting the density estimate, including
-        x_limit : tuple
-            The tuple to specify the domain of the plot of density estimate in the horizontal axis.
-            Must be of length 2. Both components must be finite numbers.
-            
-        y_limit : tuple
-            The tuple to specify the domain of the plot of density estimate in the vertical axis.
-            Must be of length 2. Both components must be finite numbers.
-        
-        plot_pts_cnt : int
-            The number of points to be evaluated along the plot_domain to make a plot of density estimate.
-        
-        figsize : typle
-            The size of the plot of density estimate.
-            
-        den_color : str or tuple
-            The color for plotting the density estimate; see details at
-            https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
-        
-        hist_color : str or tuple
-            The color for plotting the histogram; see details at
-            https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
-        
-        bins : int or sequence or str
-            The bins used for plotting the histogram; see details at
-            https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html.
-        
-        hist_alpha : float
-            Set the alpha value used for blending in plotting the histogram.
-        
-        font_size : int
-            The font size in the plot.
+        The dict containing plotting parameters returned from the function plot_density_1d_params.
     
     save_plot : bool, optional
         Whether to save the plot of the density estimate as a local file; default is False.
@@ -176,7 +207,7 @@ def plot_density_1d_scorematchingbasis_updated(data, kernel_function, base_densi
                                                batch_size, plot_kwargs):
     
     """
-    Makes the plot of the density estimate with the histogram over a bounded one-dimensional interval.
+    Plots the density estimate with the histogram over a bounded one-dimensional interval.
     
     Parameters
     ----------
@@ -185,14 +216,14 @@ def plot_density_1d_scorematchingbasis_updated(data, kernel_function, base_densi
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes in kernel_function.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes in base_density.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
-        The array of coefficients for basis functions in the natural parameter in the estimated density function.
+        The array of coefficients of basis functions in the estimated density function.
         
     normalizing : bool
         Whether to plot the normalized density estimate.
@@ -218,35 +249,7 @@ def plot_density_1d_scorematchingbasis_updated(data, kernel_function, base_densi
         The batch size used in batch Monte Carlo to approximate the normalizing constant.
     
     plot_kwargs : dict
-        The dict containing parameters for plotting the density estimate, including
-        x_limit : tuple
-            The tuple to specify the domain of the plot of density estimate in the horizontal axis.
-            Must be of length 2. Both components must be finite numbers.
-            
-        y_limit : tuple
-            The tuple to specify the domain of the plot of density estimate in the vertical axis.
-            Must be of length 2. Both components must be finite numbers.
-        
-        plot_pts_cnt : int
-            The number of points to be evaluated along the plot_domain to make a plot of density estimate.
-        
-        figsize : typle
-            The size of the plot of density estimate.
-            
-        den_color : str or tuple
-            The color for plotting the density estimate; see details at
-            https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
-        
-        hist_color : str or tuple
-            The color for plotting the histogram; see details at
-            https://matplotlib.org/3.1.0/tutorials/colors/colors.html.
-        
-        bins : int or sequence or str
-            The bins used for plotting the histogram; see details at
-            https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html.
-        
-        hist_alpha : float
-            Set the alpha value used for blending in plotting the histogram.
+        The dict containing plotting parameters returned from the function plot_density_1d_params.
         
     Returns
     -------
