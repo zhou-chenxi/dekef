@@ -1,4 +1,5 @@
 from dekef.scorematching_common_functions import *
+from check import *
 
 
 class UnnormalizedDensity:
@@ -15,11 +16,11 @@ class UnnormalizedDensity:
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'kernel_function'.
+        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        Must be instantiated from the classes with __type__ being 'base_density'.
+        __type__ must be 'base_density'.
     
     coef : numpy.ndarray
         The array of coefficients for basis functions in the natural parameter in the estimated density function.
@@ -35,7 +36,7 @@ class UnnormalizedDensity:
         k (X_1, .), ..., k (X_n, .).
     
     natural_param_eval_smbasis(new_data)
-        Evaluates the natural parameter at new data using the basis functions of
+        Evaluates the natural parameter at new data using the same basis functions as those of
         the score matching density estimator.
     
     density_eval_smbasis(new_data)
@@ -54,12 +55,12 @@ class UnnormalizedDensity:
 
     density_eval_smbasis_1d(x)
         Evaluates the un-normalized density estimate at a 1-dimensional data point x using
-        the basis functions of the natural parameter in the score matching density estimators.
+        the same basis functions as those in the score matching density estimators.
     
     density_eval_smbasis_2d(x0, x1)
         Evaluates the un-normalized density estimate at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively, using the basis functions of
-        the natural parameter in the score matching density estimators.
+        where x0 and x1 are the two coordinates, respectively, using the same basis functions as
+        those in the score matching density estimators.
     
     References
     ----------
@@ -67,6 +68,9 @@ class UnnormalizedDensity:
         217–34.
     Gu, Chong. 1993. “Smoothing Spline Density Estimation: A Dimensionless Automatic Algorithm.” Journal of the
         American Statistical Association 88 (422): 495–504.
+    Sriperumbudur, Bharath, Kenji Fukumizu, Arthur Gretton, Aapo Hyvärinen, and Revant Kumar. 2017.
+        “Density Estimation in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research:
+        JMLR 18 (57): 1–59.
         
     """
     
@@ -90,7 +94,11 @@ class UnnormalizedDensity:
             The array of coefficients for the natural parameter in the density estimate.
             
         """
-        
+
+        check_kernelfunction(kernel_function)
+        check_basedensity(base_density)
+        check_samedata(kernel_function, base_density)
+
         self.data = data
         self.kernel_function = kernel_function
         self.base_density = base_density
@@ -150,7 +158,7 @@ class UnnormalizedDensity:
     def natural_param_eval_smbasis(self, new_data):
 
         """
-        Evaluates the natural parameter at new data using the basis functions of
+        Evaluates the natural parameter at new data using the same basis functions as those in
         the score matching density estimator.
         
         Parameters
@@ -162,6 +170,12 @@ class UnnormalizedDensity:
         -------
         numpy.ndarray
             The 1-dimensional array of the natural parameter estimates at new_data.
+        
+        References
+        ----------
+        Sriperumbudur, Bharath, Kenji Fukumizu, Arthur Gretton, Aapo Hyvärinen, and Revant Kumar. 2017.
+            “Density Estimation in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research:
+            JMLR 18 (57): 1–59.
         
         """
         
@@ -189,7 +203,7 @@ class UnnormalizedDensity:
     def density_eval_smbasis(self, new_data):
         
         """
-        Evaluates the un-normalized density estimate at new data using the basis functions of
+        Evaluates the un-normalized density estimate at new data using the same basis functions as those in
         the score matching density estimator.
         
         Parameters
@@ -201,6 +215,12 @@ class UnnormalizedDensity:
         -------
         numpy.ndarray
             The 1-dimensional array of the un-normalized density estimates at new_data.
+            
+        References
+        ----------
+        Sriperumbudur, Bharath, Kenji Fukumizu, Arthur Gretton, Aapo Hyvärinen, and Revant Kumar. 2017.
+            “Density Estimation in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research:
+            JMLR 18 (57): 1–59.
             
         """
         
@@ -297,7 +317,7 @@ class UnnormalizedDensity:
         
         """
         Evaluates the un-normalized density estimate at a 1-dimensional data point x using
-        the basis functions of the natural parameter in the score matching density estimators.
+        the same basis functions as those in the score matching density estimators.
 
         Parameters
         ----------
@@ -309,6 +329,12 @@ class UnnormalizedDensity:
         float
             A floating point number of the un-normalized density estimate at x.
         
+        References
+        ----------
+        Sriperumbudur, Bharath, Kenji Fukumizu, Arthur Gretton, Aapo Hyvärinen, and Revant Kumar. 2017.
+            “Density Estimation in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research:
+            JMLR 18 (57): 1–59.
+            
         """
         
         n_obs = self.data.shape[0]
@@ -333,8 +359,8 @@ class UnnormalizedDensity:
         
         """
         Evaluates the un-normalized density estimate at a 2-dimensional data point (x0, x1),
-        where x0 and x1 are the two coordinates, respectively, using the basis functions of
-        the natural parameter in the score matching density estimators.
+        where x0 and x1 are the two coordinates, respectively, using the same basis functions as
+        those in the score matching density estimators.
 
         Parameters
         ----------
@@ -346,6 +372,12 @@ class UnnormalizedDensity:
         -------
         float
             A floating point number of the un-normalized density estimate at (x0, x1).
+            
+        References
+        ----------
+        Sriperumbudur, Bharath, Kenji Fukumizu, Arthur Gretton, Aapo Hyvärinen, and Revant Kumar. 2017.
+            “Density Estimation in Infinite Dimensional Exponential Families.” Journal of Machine Learning Research:
+            JMLR 18 (57): 1–59.
             
         """
         
