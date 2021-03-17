@@ -1,5 +1,5 @@
 import numpy as np
-from check import *
+from dekef.check import *
 
 
 def scorematching_loss_function(data, new_data, coef, kernel_function, base_density):
@@ -37,7 +37,6 @@ def scorematching_loss_function(data, new_data, coef, kernel_function, base_dens
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
