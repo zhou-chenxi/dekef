@@ -10,6 +10,7 @@ def check_basedensity(base_density):
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
 		__type__ must be 'base_density'.
+		
 	"""
 
 	input_type = base_density.__type__()
@@ -17,6 +18,10 @@ def check_basedensity(base_density):
 	if input_type != 'base_density':
 		
 		raise TypeError('The __type__ of base_density should be base_density, but got {}'.format(input_type))
+	
+	else:
+		
+		pass
 
 
 def check_kernelfunction(kernel_function):
@@ -35,7 +40,11 @@ def check_kernelfunction(kernel_function):
 	if input_type != 'kernel_function':
 		
 		raise TypeError('The __type__ of kernel_function should be kernel_function, but got {}'.format(input_type))
-
+	
+	else:
+		
+		pass
+	
 
 def check_samedata(kernel_function, base_density):
 	
@@ -59,3 +68,7 @@ def check_samedata(kernel_function, base_density):
 		
 		raise ValueError(('The data from kernel_function and base_density are different. '
 						  'Please double check the data input.'))
+	
+	else:
+		
+		pass
