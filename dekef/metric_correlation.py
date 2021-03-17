@@ -1,6 +1,6 @@
 import numpy as np
 from dekef.unnormalized_density import *
-from check import *
+from dekef.check import *
 
 
 def metric_corr(data, test_data, kernel_function, base_density, coef, true_density):
@@ -47,7 +47,6 @@ def metric_corr(data, test_data, kernel_function, base_density, coef, true_densi
 
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
 
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
