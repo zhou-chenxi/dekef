@@ -1,7 +1,7 @@
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
 from dekef.scorematching_loss_function import *
-from check import *
+from dekef.check import *
 
 
 def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_num, step_size, threshold=1e-8):
@@ -42,7 +42,6 @@ def scorematching_earlystopping_coef(data, kernel_function, base_density, iter_n
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	N, d = data.shape
 	
@@ -126,7 +125,6 @@ def scorematching_earlystopping_optiter(data, kernel_function, base_density, ite
 	
 	check_kernelfunction(kernel_function)
 	check_basedensity(base_density)
-	check_samedata(kernel_function, base_density)
 	
 	if len(data.shape) == 1:
 		data = data.reshape(-1, 1)
