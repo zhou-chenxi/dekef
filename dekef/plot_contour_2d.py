@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from scipy import integrate
 from dekef.unnormalized_density import *
-from check import *
+from dekef.check import *
 
 
 def plot_contour_2d_params(plot_domain, plot_pts_cnt=500, filled_contour=False, figsize=(10, 10), font_size=20):
