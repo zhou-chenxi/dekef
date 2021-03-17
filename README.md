@@ -11,8 +11,8 @@
 
 - computing density estimates in kernel exponential families using the score matching
   loss function and the negative log-likelihood loss function, 
-- visualizing the density estimate when data are 1-dimensional or 
-  the contour plot of the density estimate when data are 
+- visualizing the density estimates when data are 1-dimensional or 
+  the contour plot of the density estimates when data are 
   2-dimensional, and
 - assessing the quality of density estimates using the correlation and 
   the mean integrated squared error ([MISE](https://en.wikipedia.org/wiki/Mean_integrated_squared_error)).
@@ -50,6 +50,7 @@ npm test
 ```
 --->
 
+<!---
 ## History
 
 * 0.3
@@ -60,6 +61,7 @@ npm test
 
 * 0.1
     * Work in progress - February 11, 2021
+--->
 
 ## Meta
 
