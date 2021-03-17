@@ -873,7 +873,7 @@ def negloglik_gubasis_penalized_optlambda(data, kernel_function, base_density,
             # compute the coefficient vector for the given lambda 
             train_algo_control = negloglik_penalized_optalgoparams(
                 start_pt=np.zeros((train_data.shape[0], 1), dtype=np.float64),
-                step_size=step_size[j],
+                step_size=float(step_size[j]),
                 max_iter=optalgo_params["max_iter"],
                 rel_tol=optalgo_params["rel_tol"])
             
@@ -913,7 +913,7 @@ def negloglik_gubasis_penalized_optlambda(data, kernel_function, base_density,
     print("=" * 50 + "\nFinal run with the optimal lambda.")
 
     # compute the coefficient vector at the optimal penalty parameter
-    optalgo_params['step_size'] = step_size[np.argmin(nll_scores)]
+    optalgo_params['step_size'] = float(step_size[np.argmin(nll_scores)])
     opt_coef = negloglik_gubasis_coef(
         data=data,
         kernel_function=kernel_function,
