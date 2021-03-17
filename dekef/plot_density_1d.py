@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from dekef.unnormalized_density import *
 import sys
-from check import *
+from dekef.check import *
 
 
 def plot_density_1d_params(x_limit, y_limit, plot_pts_cnt=2000, figsize=(10, 10),
-                           den_color='tab:blue', hist_color='tab:blue', bins='fd', his_alpha=0.5, font_size=20):
+                           den_color='tab:blue', hist_color='tab:blue', bins='fd', hist_alpha=0.5, fontsize=20):
     
     """
     Specifies and returns the plotting parameters used in the function plot_density_1d.
@@ -43,7 +43,7 @@ def plot_density_1d_params(x_limit, y_limit, plot_pts_cnt=2000, figsize=(10, 10)
     hist_alpha : float, optional
         Set the alpha value used for blending in plotting the histogram; default is 0.5.
         
-    font_size : int, optional
+    fontsize : int, optional
         The font size in the plot; default is 20.
             
     Returns
@@ -60,8 +60,8 @@ def plot_density_1d_params(x_limit, y_limit, plot_pts_cnt=2000, figsize=(10, 10)
               'den_color': den_color,
               'hist_color': hist_color,
               'bins': bins,
-              'his_alpha': his_alpha,
-              'font_size': font_size}
+              'hist_alpha': hist_alpha,
+              'fontsize': fontsize}
     
     return output
 
