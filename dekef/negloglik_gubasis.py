@@ -1,5 +1,5 @@
 import warnings
-from check import *
+from dekef.check import *
 from dekef.kernel_function import *
 
 
@@ -451,7 +451,6 @@ def negloglik_gubasis_coef(data, kernel_function, base_density, lambda_param, op
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
 
     if lambda_param < 0.:
         raise ValueError("The lambda_param cannot be negative.")
@@ -795,7 +794,6 @@ def negloglik_gubasis_penalized_optlambda(data, kernel_function, base_density,
     
     check_kernelfunction(kernel_function)
     check_basedensity(base_density)
-    check_samedata(kernel_function, base_density)
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
