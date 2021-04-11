@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
 	name='dekef',
-	version='1.0',
+	version='2.0',
 	packages=['dekef'],
 	url='https://github.com/zhoucx1119/dekef',
 	license='',
