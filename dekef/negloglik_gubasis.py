@@ -67,6 +67,9 @@ def negloglik_gubasis_grad_logpar_batchmc(data, kernel_function, base_density, c
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
     
+    if len(coef.shape) == 1:
+        coef = coef.reshape(-1, 1)
+    
     N, d = data.shape
     coef_len = N
 
@@ -235,6 +238,9 @@ def negloglik_gubasis_grad_logpar_batchmc_se(data, kernel_function, base_density
     
     if len(data.shape) == 1:
         data = data.reshape(-1, 1)
+
+        if len(coef.shape) == 1:
+            coef = coef.reshape(-1, 1)
         
     N, d = data.shape
     
@@ -353,10 +359,10 @@ def batch_montecarlo_params(mc_batch_size=1000, mc_tol=1e-2):
     return output
 
 
-def negloglik_penalized_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, rel_tol=1e-5):
+def negloglik_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, rel_tol=1e-5):
     
     """
-    Returns a dictionary of parameters used in minimizing the penalized negative log-likelihood loss function
+    Returns a dictionary of parameters used in minimizing the (penalized) negative log-likelihood loss function
     by using the gradient descent algorithm.
 
     Parameters
@@ -439,7 +445,7 @@ def negloglik_gubasis_coef(data, kernel_function, base_density, lambda_param, op
     Returns
     -------
     numpy.ndarray
-        An array of coefficients for the penalized negative log-likelihood density estimate.
+        An array of coefficients for the natural parameter in the penalized negative log-likelihood density estimate.
 
     References
     ----------
