@@ -78,6 +78,13 @@ class GaussianPoly2(KernelFunction):
         with the ((i-1)*d+u, j)-th entry being partial_u k (X_i, Y_j),
         where partial_u k denotes the first partial derivative of k with respect to the u-th coordinate
         of its first argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
+        
+    partial_kernel_matrix_01(new_data)
+        Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0]) using
+        the Gaussian kernel function plus the polynomial kernel function of degree 2,
+        with the ((i-1)*d+u, j)-th entry being partial_{d+u} k (X_i, Y_j),
+        where partial_{d+u} k denotes the first partial derivative of k with respect to the u-th coordinate
+        of its second argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
     partial_kernel_matrix_20(new_data)
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0]) using
@@ -85,6 +92,13 @@ class GaussianPoly2(KernelFunction):
         with the ((i-1)*d+u, j)-th entry being partial_u^2 k (X_i, Y_j),
         where partial_u^2 k denotes the second partial derivative of k with respect to the u-th coordinate
         of its first argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
+    
+    partial_kernel_matrix_02(new_data)
+        Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0]) using
+        the Gaussian kernel function plus the polynomial kernel function of degree 2,
+        with the ((i-1)*d+u, j)-th entry being partial_{d+u}^2 k (X_i, Y_j),
+        where partial_{d+u}^2 k denotes the second partial derivative of k with respect to the u-th coordinate
+        of its second argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
 
     partial_kernel_matrix_11(new_data)
         Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0] * new_data.shape[1]) using
@@ -317,8 +331,8 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         numpy.ndarray
-            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0]) with the ((i-1)*d+u, j)-th entry being
-            partial_u k (X_i, Y_j).
+            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0])
+            with the ((i-1)*d+u, j)-th entry being partial_u k (X_i, Y_j).
             
         """
         
@@ -343,6 +357,51 @@ class GaussianPoly2(KernelFunction):
         output = gauss_partial + poly_partial
         
         return output
+
+    def partial_kernel_matrix_01(self, new_data):
+    
+        """
+        Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0]) using
+        the Gaussian kernel function plus the polynomial kernel function of degree 2,
+        with the ((i-1)*d+u, j)-th entry being partial_{d+u} k (X_i, Y_j),
+        where partial_{d+u} k denotes the first partial derivative of k with respect to the u-th coordinate
+        of its second argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
+
+        Parameters
+        ----------
+        new_data : numpy.ndarray
+            A new data array at which first partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
+
+        Returns
+        -------
+        numpy.ndarray
+            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0])
+            with the ((i-1)*d+u, j)-th entry being partial_{d+u} k (X_i, Y_j).
+
+        """
+    
+        n, d1 = new_data.shape
+    
+        assert self.d == d1, "The dimensionality of new_data does not match that of data. "
+    
+        # ----------------------------------------------------------------------
+        # Gaussian kernel part
+        gauss_kernel = np.repeat(self.gaussian_kernel_gram_matrix(new_data=new_data),
+                                 repeats=self.d, axis=0)
+        multi_gauss1 = np.repeat(self.data.flatten(), n).reshape(self.N * self.d, n)
+        multi_gauss2 = np.tile(new_data.T, (self.N, 1))
+        gauss_partial = (-self.r1 * gauss_kernel * (multi_gauss1 - multi_gauss2) / self.bw ** 2) * (-1.)
+
+        # ----------------------------------------------------------------------
+        # Poly2 kernel part
+        poly_part = np.repeat((self.poly_kernel_gram_matrix(new_data=new_data) + self.c), repeats=self.d, axis=0)
+        multi_poly = np.tile(self.data.flatten().reshape(-1, 1), (1, n))
+        poly_partial = 2. * self.r2 * poly_part * multi_poly
+
+        output = gauss_partial + poly_partial
+
+        return output
     
     def partial_kernel_matrix_20(self, new_data): 
         
@@ -362,8 +421,8 @@ class GaussianPoly2(KernelFunction):
         Returns
         -------
         numpy.ndarray
-            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0]) with the ((i-1)*d+u, j)-th entry being
-            partial_u^2 k (X_i, Y_j).
+            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0])
+            with the ((i-1)*d+u, j)-th entry being partial_u^2 k (X_i, Y_j).
             
         """
         
@@ -387,6 +446,51 @@ class GaussianPoly2(KernelFunction):
         
         output = gauss_partial + poly_partial
         
+        return output
+
+    def partial_kernel_matrix_02(self, new_data):
+    
+        """
+        Computes the matrix of shape (data.shape[0] * data.shape[1], new_data.shape[0]) using
+        the Gaussian kernel function plus the polynomial kernel function of degree 2,
+        with the ((i-1)*d+u, j)-th entry being partial_{d+u}^2 k (X_i, Y_j),
+        where partial_{d+u}^2 k denotes the second partial derivative of k with respect to the u-th coordinate
+        of its second argument, X_i is the i-th row in data, and Y_j is the j-th row in new_data.
+
+        Parameters
+        ----------
+        new_data : numpy.ndarray
+            A new data array at which second partial of the Gaussian kernel function plus
+            the polynomial kernel function of degree 2 is to be evaluated.
+
+        Returns
+        -------
+        numpy.ndarray
+            An array of shape (data.shape[0] * data.shape[1], new_data.shape[0])
+            with the ((i-1)*d+u, j)-th entry being partial_{d+u}^2 k (X_i, Y_j).
+
+        """
+    
+        n, d1 = new_data.shape
+    
+        assert self.d == d1, "The dimensionality of new_data does not match that of data. "
+    
+        # ----------------------------------------------------------------------
+        # Gaussian kernel part
+        gauss_kernel = np.repeat(self.gaussian_kernel_gram_matrix(new_data=new_data), repeats=self.d, axis=0)
+        multi_gauss_part1 = np.repeat(self.data.flatten(), n).reshape(self.N * self.d, n)
+        multi_gauss_part2 = np.tile(new_data.T, (self.N, 1))
+        multi_gauss_part = ((multi_gauss_part1 - multi_gauss_part2) ** 2 / self.bw ** 4 -
+                            1 / self.bw ** 2)
+        gauss_partial = self.r1 * multi_gauss_part * gauss_kernel
+    
+        # ----------------------------------------------------------------------
+        # Poly2 kernel part
+        multi_poly = np.tile(self.data.flatten().reshape(-1, 1), (1, n)) ** 2
+        poly_partial = 2. * self.r2 * multi_poly
+    
+        output = gauss_partial + poly_partial
+    
         return output
         
     def partial_kernel_matrix_11(self, new_data): 
