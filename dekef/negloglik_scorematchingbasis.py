@@ -905,7 +905,7 @@ def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
                                            "'rationalquad_poly2'."))
                 
             # compute the coefficient vector for the given lambda
-            train_algo_control = negloglik_penalized_optalgoparams(
+            train_algo_control = negloglik_optalgoparams(
                 start_pt=np.zeros((train_data.shape[0] * train_data.shape[1] + 1, 1), dtype=np.float64),
                 step_size=float(step_size[j]),
                 max_iter=optalgo_params["max_iter"],
