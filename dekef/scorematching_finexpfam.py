@@ -31,20 +31,22 @@ def scorematching_finexpfam_gubasis_coef(data, kernel_function, base_density):
 	"""
 	
 	N, d = data.shape
+	n_basis = kernel_function.data.shape[0]
 	
 	# compute DT(X_i) DT(X_i)^\top
 	DT = kernel_function.partial_kernel_matrix_01(data)
-	dt_prod_term = sum([np.matmul(DT[:, i].reshape(N, d), DT[:, i].reshape(N, d).T) for i in range(N)])
+	dt_prod_term = sum([np.matmul(DT[:, i].reshape(n_basis, d),
+								  DT[:, i].reshape(n_basis, d).T) for i in range(N)])
 	
 	# compute the matrix G, which involves the second derivative
 	matG = kernel_function.partial_kernel_matrix_02(data)
-	sum_matG = np.sum(sum([matG[:, i].reshape(N, d) for i in range(N)]), axis=1, keepdims=True)
+	sum_matG = np.sum(sum([matG[:, i].reshape(n_basis, d) for i in range(N)]), axis=1, keepdims=True)
 	
 	# compute DT and grad of log mu
 	# compute the gradient of log mu at data
 	# each row corresponds to one data point
 	grad_logmu = np.array([base_density.logbaseden_deriv1(data, j).flatten() for j in range(d)]).T
-	dt_baseden_term = sum([np.matmul(DT[:, i].reshape(N, d), grad_logmu[[i]].T) for i in range(N)])
+	dt_baseden_term = sum([np.matmul(DT[:, i].reshape(n_basis, d), grad_logmu[[i]].T) for i in range(N)])
 	
 	b_term = sum_matG + dt_baseden_term
 	
