@@ -74,11 +74,6 @@ def negloglik_finexpfam_gubasis_coef(data, kernel_function, base_density, optalg
 		raise ValueError("The step_size in optalgo_params must be strictly positive, but got {}.".format(
 			step_size))
 	
-	if len(start_pt) != N:
-		raise ValueError(("The supplied start_pt in optalgo_params is not correct. "
-						  "The expected length of start_pt is {exp_len}, but got {act_len}.").format(
-			exp_len=N, act_len=len(start_pt)))
-	
 	# parameters associated with batch Monte Carlo estimation
 	mc_batch_size = batchmc_params["mc_batch_size"]
 	mc_tol = batchmc_params["mc_tol"]
