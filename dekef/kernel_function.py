@@ -4,10 +4,10 @@ import numpy as np
 class KernelFunction:
     
     """
-    A parent class for the base density.
+    A parent class for the kernel function.
 
     __type__
-        Set __type__ to be the base density.
+        Set __type__ to be 'kernel_function'.
 
     """
     
