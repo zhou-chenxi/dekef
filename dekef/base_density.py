@@ -47,7 +47,7 @@ class BasedenUniform(Baseden):
     Methods
     -------
     sample(n_samples)
-        Draws samples from uniform base distribution of sample size n_samples.
+        Draws random samples from uniform base distribution of size n_samples.
 
     baseden_eval(new_data)
         Evaluates the uniform base density function at new_data.
@@ -130,7 +130,7 @@ class BasedenUniform(Baseden):
     def sample(self, n_samples):
 
         """
-        Draws samples from the uniform distribution of sample size n_samples.
+        Draws random samples from the uniform distribution of size n_samples.
 
         Parameters
         ----------
@@ -334,7 +334,7 @@ class BasedenExp(Baseden):
     Methods
     -------
     sample(n_samples)
-        Draws samples from the exponential base distribution of sample size n_samples.
+        Draws random samples from the exponential base distribution of size n_samples.
 
     baseden_eval(new_data)
         Evaluates the exponential base density function at new_data.
@@ -388,7 +388,7 @@ class BasedenExp(Baseden):
     def sample(self, n_samples):
 
         """
-        Draws samples from the exponential distribution of sample size n_samples.
+        Draws random samples from the log-normal distribution of size n_samples.
 
         Parameters
         ----------
@@ -569,7 +569,7 @@ class BasedenGamma(Baseden):
     Methods
     -------
     sample(n_samples)
-        Draws samples from the gamma base distribution of sample size n_samples.
+        Draws random samples from the gamma base distribution of size n_samples.
 
     baseden_eval(new_data)
         Evaluates the gamma base density function at new_data.
@@ -645,7 +645,7 @@ class BasedenGamma(Baseden):
     def sample(self, n_samples):
 
         """
-        Draws samples from the gamma distribution of sample size n_samples.
+        Draws random samples from the log-normal distribution of size n_samples.
 
         Parameters
         ----------
@@ -820,7 +820,7 @@ class BasedenNormal(Baseden):
     Methods
     -------
     sample(n_samples)
-        Draws samples from the multivariate normal base distribution of sample size n_samples.
+        Draws random samples from the multivariate normal base distribution of size n_samples.
 
     baseden_eval(new_data)
         Evaluates the multivariate normal base density function at new_data.
@@ -882,8 +882,8 @@ class BasedenNormal(Baseden):
     def sample(self, n_samples):
 
         """
-        Draws samples from the multivariate normal distribution of sample size n_samples.
-
+        Draws random samples from the log-normal distribution of size n_samples.
+        
         Parameters
         ----------
         n_samples : int
@@ -1121,7 +1121,7 @@ class BasedenLognormal(Baseden):
     Methods
     -------
     sample(n_samples)
-        Draws samples from the log-normal base distribution of sample size n_samples.
+        Draws random samples from the log-normal base distribution of size n_samples.
 
     baseden_eval(new_data)
         Evaluates the log-normal base density function at new_data.
@@ -1169,7 +1169,7 @@ class BasedenLognormal(Baseden):
     def sample(self, n_samples):
 
         """
-        Draws samples from the log-normal distribution of sample size n_samples.
+        Draws random samples from the log-normal distribution of size n_samples.
 
         Parameters
         ----------
