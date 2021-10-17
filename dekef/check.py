@@ -9,7 +9,7 @@ def check_basedensity(base_density):
 	
 	base_density : base_density object
 		The base density function used to estimate the probability density function.
-		__type__ must be 'base_density'.
+		__type__ must be 'base_density'; otherwise, TypeError is raised.
 		
 	"""
 
@@ -31,7 +31,7 @@ def check_kernelfunction(kernel_function):
 
 	kernel_function : kernel_function object
 		The kernel function used to estimate the probability density function.
-		__type__ must be 'kernel_function'.
+		__type__ must be 'kernel_function'; otherwise, TypeError is raised.
 		
 	"""
 	
