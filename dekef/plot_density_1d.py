@@ -115,7 +115,7 @@ def plot_density_1d(data, kernel_function, base_density, coef, normalizing, meth
     -------
     dict
         A dictionary of x_vals, the values of the horizontal axis for plotting, and
-        den_vals, the values of the vertial axis for plotting.
+        den_vals, the values of the vertical axis for plotting.
     
     """
     
