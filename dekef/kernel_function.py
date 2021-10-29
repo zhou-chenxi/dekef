@@ -1030,7 +1030,7 @@ class RationalQuadPoly2(KernelFunction):
     
     """
     This is a class of a rational quadratic kernel function plus a polynomial kernel function of degree 2,
-    k (x, y) = r1 * (1 + (||x - y|| ^ 2 / (2 * bw ^ 2))) ^ (-1) + r2 * (x^\top y + c) ^ 2.
+    k (x, y) = r1 * (1 + (||x - y|| ^ 2 / bw ^ 2)) ^ (-1) + r2 * (x^\top y + c) ^ 2.
 
     ...
 
