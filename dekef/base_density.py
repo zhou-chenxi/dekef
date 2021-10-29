@@ -43,6 +43,9 @@ class BasedenUniform(Baseden):
         
     dim : int
         The dimensionality of data and the underlying uniform base density function, that is, d.
+        
+    name : str
+        The name of the base density function, i.e., 'Uniform'.
 
     Methods
     -------
@@ -126,6 +129,7 @@ class BasedenUniform(Baseden):
         self.domain = np.array(domain)
         self.dim = data.shape[1]
         self.data = data
+        self.name = 'Uniform'
 
     def sample(self, n_samples):
 
@@ -330,6 +334,9 @@ class BasedenExp(Baseden):
         
     dim : int
         The dimensionality of data and the underlying exponential base density function, that is, 1.
+        
+    name : str
+        The name of the base density function, i.e., 'Exponential'.
 
     Methods
     -------
@@ -384,6 +391,7 @@ class BasedenExp(Baseden):
 
         self.dim = 1
         self.domain = [[0., np.inf]]
+        self.name = 'Exponential'
 
     def sample(self, n_samples):
 
@@ -565,6 +573,9 @@ class BasedenGamma(Baseden):
         
     dim : int
         The dimensionality of data and the underlying gamma base density function, that is, 1.
+        
+    name : str
+        The name of the base density function, i.e., 'Gamma'.
 
     Methods
     -------
@@ -641,6 +652,7 @@ class BasedenGamma(Baseden):
         self.loc = 0.
         self.dim = 1
         self.domain = [[0., np.inf]]
+        self.name = 'Gamma'
 
     def sample(self, n_samples):
 
@@ -816,6 +828,9 @@ class BasedenNormal(Baseden):
         
     dim : int
         The dimensionality of data and the underlying multivariate normal base density function, that is, d.
+        
+    name : str
+        The name of the base density function, i.e., 'Normal'.
 
     Methods
     -------
@@ -878,6 +893,7 @@ class BasedenNormal(Baseden):
         self.base_sd = base_sd
         self.covmat = base_sd ** 2 * np.eye(self.dim, dtype=np.float64)
         self.domain = np.array([[-np.inf, np.inf]] * self.dim)
+        self.name = 'Normal'
 
     def sample(self, n_samples):
 
@@ -1117,6 +1133,9 @@ class BasedenLognormal(Baseden):
         
     dim : int
         The dimensionality of data and the underlying log-normal base density function, that is, 1.
+        
+    name : str
+        The name of the base density function, i.e., 'Lognormal'.
 
     Methods
     -------
@@ -1165,6 +1184,7 @@ class BasedenLognormal(Baseden):
 
         self.dim = 1
         self.domain = [[0., np.inf]]
+        self.name = 'Lognormal'
 
     def sample(self, n_samples):
 
