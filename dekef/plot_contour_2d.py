@@ -5,6 +5,7 @@ from dekef.check import *
 
 
 def plot_contour_2d_params(plot_domain, plot_pts_cnt=500, filled_contour=False, figsize=(10, 10), font_size=20):
+	
 	"""
 	Specifies and returns the plotting parameters used in the function plot_contour_2d.
 	
@@ -39,8 +40,8 @@ def plot_contour_2d_params(plot_domain, plot_pts_cnt=500, filled_contour=False, 
 	return output
 
 
-def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, method,
-					x_label, y_label, plot_kwargs, save_plot=False, save_dir=None):
+def plot_contour_2d(data, kernel_function, base_density, basis_type, coef, normalizing, method,
+					x_label, y_label, plot_kwargs, grid_points, save_plot=False, save_dir=None):
 	"""
 	Makes the contour plot of the density estimate over a bounded two-dimensional region.
 	
@@ -57,6 +58,15 @@ def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, meth
 		The base density function used to estimate the probability density function.
 		__type__ must be 'base_density'.
 	
+	basis_type : str
+		The type of the basis functions in the natural parameter. Must be one of
+			- 'gubasis', the basis functions being the kernel functions centered at data,
+			- 'smbasis', the basis functions being the same as those in the score matching density estimator, i.e.,
+						 a linear combination of the first two partial derivatives of the kernel functions centered
+						 at data,
+			- 'grid_points', the basis functions being the kernel functions centered at a set of
+							 pre-specified grid points.
+	
 	coef : numpy.ndarray
 		The array of coefficients for basis functions in the natural parameter in the estimated density function.
 	
@@ -72,6 +82,10 @@ def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, meth
 	y_label : str
 		The label of the vertical axis.
 	
+	grid_points : numpy.ndarray, optional
+		The set of grid points at which the kernel functions are centered.
+		Only need to supple when basis_type is 'grid_points'. Default is None.
+		
 	save_plot : bool, optional
 		Whether to save the contour plot of the density estimate as a local file; default is False.
 	
@@ -112,22 +126,29 @@ def plot_contour_2d(data, kernel_function, base_density, coef, normalizing, meth
 		data=data,
 		kernel_function=kernel_function,
 		base_density=base_density,
-		coef=coef)
+		coef=coef,
+		basis_type=basis_type,
+		grid_points=grid_points
+	)
 	
-	if coef.shape[0] == n_obs:
+	if basis_type == 'gubasis':
 		
 		# Gu's basis
 		unnorm_fun = unnorm.density_eval_gubasis_2d
 	
-	elif coef.shape[0] == 2 * n_obs + 1:
+	elif basis_type == 'smbasis':
 		
 		# score matching basis
 		unnorm_fun = unnorm.density_eval_smbasis_2d
 	
+	elif basis_type == 'grid_points':
+		
+		# score matching basis
+		unnorm_fun = unnorm.density_eval_grid_points_2d
+	
 	else:
 		
-		raise ValueError(("The length of coef is not correct and matches neither Gu's basis functions "
-						  "nor score matching basis functions."))
+		raise ValueError(f"basis_type must be one of 'gubasis', 'smbasis', and 'grid_points', but got {basis_type}.")
 	
 	x0_cand = np.linspace(plot_domain1[0][0], plot_domain1[0][1], num=plot_kwargs['plot_pts_cnt'])
 	x1_cand = np.linspace(plot_domain1[1][0], plot_domain1[1][1], num=plot_kwargs['plot_pts_cnt'])
