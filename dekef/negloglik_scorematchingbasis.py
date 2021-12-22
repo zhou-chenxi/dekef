@@ -2,971 +2,891 @@ import warnings
 from dekef.check import *
 from dekef.kernel_function import *
 from dekef.scorematching_common_functions import *
+from dekef.negloglik_params import *
 
-
-def negloglik_smbasis_grad_logpar_batchmc(data, kernel_function, base_density, coef, batch_size, tol_param, 
-                                          normalizing_const_only=False, print_error=False):
+class NegLogLikSMBasis:
     
     """
-    Approximates the log-partition function, A, at coef and its gradient at coef using the basis functions in
-    the score matching density estimator. The approximation method used is the batch Monte Carlo method.
-    Terminate the sampling process until the relative difference of two consecutive approximations is
-    less than tol_param.
+    A class to estimate the probability density function by minimizing the penalized negative log-likelihood loss function
+    in a kernel exponential family, where the natural parameter uses the same basis functions
+    as that in the score matching density estimator.
     
-    Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
-    The log-partition function evaluated at coef is approximated by
-    log ((1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) )),
-    and the gradient of the log-partition function evaluated at coef is approximated by
-    (1 / M) sum_{j=1}^M phi_l (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A (coef)), for all l = 1, ..., N.
+    ...
     
-    Parameters
+    Attributes
     ----------
     data : numpy.ndarray
         The array of observations whose density function is to be estimated.
-    
-    kernel_function : kernel_function object
-        The kernel function used to estimate the probability density function.
-        __type__ must be 'kernel_function'.
         
     base_density : base_density object
         The base density function used to estimate the probability density function.
-        __type__ must be 'base_density'.
-    
-    coef : numpy.ndarray
-        The array of coefficients at which the log-partition function and its gradient are approximated.
-    
-    batch_size : int
-        The batch size in the batch Monte Carlo method.
-    
-    tol_param : float
-        The floating point number below which sampling in the batch Monte Carlo is terminated.
-        The smaller the tol_param is, the more accurate the approximations are.
-        
-    normalizing_const_only : bool, optional
-        Whether to ONLY approximate the log-partition function but not its gradient; default is False.
-    
-    print_error : bool, optional
-        Whether to print the error in the batch Monte Carlo method; default is False.
-
-    Returns
-    -------
-    float
-        The approximation of the log-partition function evaluated at coef.
-        
-    numpy.ndarray
-        The approximation of the gradient of the log-partition function evaluated at coef;
-        only returns when normalizing_const_only is False.
-    
-    """
-    
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)
-    
-    if len(coef.shape) == 1:
-        coef = coef.reshape(-1, 1)
-        
-    N, d = data.shape
-    coef_len = N * d + 1
-    
-    if len(coef) != coef_len: 
-        raise ValueError("The length of coef is incorrect, which should be {l}.".format(l=coef_len))
-    
-    ###########################################################################
-    # estimate the normalizing constant 
-    # first drawing
-    mc_samples1 = base_density.sample(batch_size)
-    mc_kernel_matrix1 = kernel_partial10_hatz(data=data,
-                                              new_data=mc_samples1,
-                                              kernel_function=kernel_function,
-                                              base_density=base_density)
-    unnorm_density_part1 = np.exp(np.matmul(mc_kernel_matrix1.T, coef))
-    norm_const1 = np.mean(unnorm_density_part1)
-    
-    # second drawing 
-    mc_samples2 = base_density.sample(batch_size)
-    mc_kernel_matrix2 = kernel_partial10_hatz(data=data,
-                                              new_data=mc_samples2,
-                                              kernel_function=kernel_function,
-                                              base_density=base_density)
-    unnorm_density_part2 = np.exp(np.matmul(mc_kernel_matrix2.T, coef))
-    norm_const2 = np.mean(unnorm_density_part2)
-    
-    norm_est_old = norm_const1
-    norm_est_new = (norm_const1 + norm_const2) / 2
-    
-    error_norm = np.abs(norm_est_old - norm_est_new) / norm_est_old
-    
-    if print_error: 
-        print('normalizing constant error = {error:.7f}'.format(error=error_norm))
-    
-    batch_cnt = 2
-    
-    while error_norm > tol_param: 
-        
-        norm_est_old = norm_est_new
-        
-        # another draw
-        mc_samples = base_density.sample(batch_size)
-        mc_kernel_matrix = kernel_partial10_hatz(
-            data=data,
-            new_data=mc_samples,
-            kernel_function=kernel_function,
-            base_density=base_density)
-        unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
-        norm_const2 = np.mean(unnorm_density_part)
-        
-        # update the Monte Carlo estimation 
-        norm_est_new = (norm_est_old * batch_cnt + norm_const2) / (batch_cnt + 1)
-
-        batch_cnt += 1
-        
-        error_norm = np.abs(norm_est_old - norm_est_new) / norm_est_old
-        
-        if print_error: 
-            print('normalizing constant error = {error:.7f}'.format(error=error_norm))
-    
-    normalizing_const = norm_est_new
-    
-    if not normalizing_const_only: 
-        
-        if print_error: 
-            print("#" * 45 + "\nEstimating the gradient of the log-partition now.")
-        
-        mc_samples1 = base_density.sample(batch_size)
-        mc_kernel_matrix1 = kernel_partial10_hatz(
-            data=data,
-            new_data=mc_samples1,
-            kernel_function=kernel_function,
-            base_density=base_density)
-        density_part1 = np.exp(np.matmul(mc_kernel_matrix1.T, coef).flatten()) / normalizing_const
-        exp_est1 = np.array([np.mean(mc_kernel_matrix1[l1, :] * density_part1)
-                             for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
-        
-        mc_samples2 = base_density.sample(batch_size)
-        mc_kernel_matrix2 = kernel_partial10_hatz(
-            data=data,
-            new_data=mc_samples2,
-            kernel_function=kernel_function,
-            base_density=base_density)
-        density_part2 = np.exp(np.matmul(mc_kernel_matrix2.T, coef).flatten()) / normalizing_const
-        exp_est2 = np.array([np.mean(mc_kernel_matrix2[l1, :] * density_part2)
-                             for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
-        
-        grad_est_old = exp_est1
-        grad_est_new = (exp_est1 + exp_est2) / 2
-        
-        error_grad = np.linalg.norm(grad_est_old - grad_est_new, 2) / (np.linalg.norm(grad_est_old, 2) * N)
-        
-        if print_error: 
-            print('gradient error = {error:.7f}'.format(error=error_grad))
-        
-        batch_cnt = 2
-        
-        while error_grad > tol_param: 
-        
-            grad_est_old = grad_est_new
-
-            # another draw
-            mc_samples = base_density.sample(batch_size)
-            mc_kernel_matrix = kernel_partial10_hatz(
-                data=data,
-                new_data=mc_samples,
-                kernel_function=kernel_function,
-                base_density=base_density)
-            density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
-            exp_est2 = np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
-                                 for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
-            
-            grad_est_new = (grad_est_old * batch_cnt + exp_est2) / (batch_cnt + 1)
-
-            batch_cnt += 1
-
-            error_grad = np.linalg.norm(grad_est_old - grad_est_new, 2) / (np.linalg.norm(grad_est_old, 2) * N)
-
-            if print_error: 
-                print('gradient error = {error:.7f}'.format(error=error_grad))
-    
-    if normalizing_const_only: 
-        return normalizing_const
-    else: 
-        return normalizing_const, grad_est_new
-    
-
-def negloglik_smbasis_grad_logpar_batchmc_se(data, kernel_function, base_density, coef, batch_size, tol_param, 
-                                             normalizing_const_only=False, print_error=False):
-    
-    """
-    Approximates the log-partition function, A, at coef and its gradient at coef using the basis functions in
-    the score matching density estimator. The approximation method used is the batch Monte Carlo method.
-    Terminate the sampling process until the standard deviation of the approximations is
-    less than tol_param.
-    
-    Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
-    The log-partition function evaluated at coef is approximated by
-    log ((1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) )),
-    and the gradient of the log-partition function evaluated at coef is approximated by
-    (1 / M) sum_{j=1}^M phi_i (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A (coef)), for all i = 1, ..., N.
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The array of observations whose density function is to be estimated.
     
     kernel_function : kernel_function object
         The kernel function used to estimate the probability density function.
-        __type__ must be 'kernel_function'.
-        
-    base_density : base_density object
-        The base density function used to estimate the probability density function.
-        __type__ must be 'base_density'.
     
-    coef : numpy.ndarray
-        The array of coefficients at which the log-partition function and its gradient are evaluated.
-    
-    batch_size : int
-        The batch size in the batch Monte Carlo method.
-    
-    tol_param : float
-        The floating point number below which sampling in the batch Monte Carlo is terminated.
-        The smaller the tol_param is, the more accurate the approximations are.
-        
-    normalizing_const_only : bool, optional
-        Whether to ONLY approximate the log-partition function but not its gradient; default is False.
-    
-    print_error : bool, optional
-        Whether to print the error in the batch Monte Carlo method; default is False.
-
-    Returns
+    Methods
     -------
-    float
-        The approximation of the log-partition function evaluated at coef.
+    grad_logpar_batchmc(coef, batch_size, tol_param, compute_grad=True, print_error=False)
+        Approximates the partition function and the gradient of the log-partition function at coef
+        using the same basis functions as those in the score matching density estimator.
+        The approximation method used is the batch Monte Carlo method.
+        Terminate the sampling process until the relative difference of two consecutive approximations is
+        less than tol_param.
+    
+    grad_logpar_batchmc_se(coef, batch_size, tol_param, compute_grad=True, print_error=False)
+        Approximates the partition function and the gradient of the log-partition function at coef
+        using the same basis functions as those in the score matching density estimator.
+        The approximation method used is the batch Monte Carlo method.
+        Terminate the sampling process until the standard deviation of the approximations is
+        less than tol_param.
         
-    numpy.ndarray
-        The approximation of the gradient of the log-partition function evaluated at coef;
-        only returns when normalizing_const_only is False.
-        
+    coef(data, lambda_param, optalgo_params, batchmc_params, batch_mc=True, print_error=True)
+        Returns the solution that minimizes the penalized negative log-likelihood loss function
+        using the same basis functions as those in the score matching density estimator.
+        The underlying minimization algorithm is the gradient descent algorithm.
+
+    eval_loss_function(new_data, coef, batchmc_params, batch_mc=True)
+        Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
+        A (f) - (1 / n) sum_{j=1}^n f (Y_j),
+        where the natural parameter f is equal to sum_{i=1}^N coef[i] phi_i,
+        phi_1, ..., phi_N are the same basis functions as those in score matching density estimator,
+        and Y_1, ..., Y_n are new_data.
+    
+    penalized_optlambda(lambda_cand, k_folds, print_error, optalgo_params, batchmc_params,
+                        save_dir, save_info=False, batch_mc=True)
+        Selects the optimal penalty parameter in the penalized negative log-likelihood density estimation
+        using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
+        The basis functions of the natural parameter are the same as those in the score matching density estimator.
+    
     """
-    
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)
-    
-    if len(coef.shape) == 1:
-        coef = coef.reshape(-1, 1)
+
+    def __init__(self, data, base_density,
+                 kernel_type='gaussian_poly2', kernel_r1=1.0, kernel_r2=0., kernel_c=0., kernel_bw=1.0):
         
-    N, d = data.shape
-    coef_len = N * d + 1
-    
-    if len(coef) != coef_len: 
-        raise ValueError("The length of coef is incorrect, which should be {l}.".format(l=coef_len))
-    
-    ###########################################################################
-    # estimate the normalizing constant 
-    # first drawing 
-    mc_samples = base_density.sample(batch_size)
-    mc_kernel_matrix = kernel_partial10_hatz(
-        data=data,
-        new_data=mc_samples,
-        kernel_function=kernel_function,
-        base_density=base_density)
-    unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
-    avg_norm_const = np.mean(unnorm_density_part)
-    sq_norm_const = np.sum(unnorm_density_part ** 2)
-    
-    error_norm = np.sqrt(sq_norm_const / batch_size - avg_norm_const ** 2) / np.sqrt(batch_size)
-    
-    if print_error: 
-        print('normalizing constant error = {error:.7f}'.format(error=error_norm))
-    
-    batch_cnt = 1
-    
-    while error_norm > tol_param: 
+        """
+        Parameters
+        ----------
+        data : numpy.ndarray
+            The array of observations whose density function is to be estimated.
+
+        base_density : base_density object
+            The base density function used to estimate the probability density function.
+            __type__ must be 'base_density'.
+
+        kernel_type : str, optional
+            The type of the kernel function used to estimate the probability density function;
+            must be one of 'gaussian_poly2' and 'rationalquad_poly2'; default is 'gaussian_poly2'.
+
+        kernel_r1 : float, optional
+            The multiplicative constant associated with the Gaussian kernel function or the rational quadratic kernel
+            function, depending on kernel_type; default is 1.
+
+        kernel_r2 : float, optional
+            The multiplicative constant associated with the polynomial kernel function of degree 2; default is 0.
+
+        kernel_c : float, optional
+            The non-homogenous additive constant in the polynomial kernel function of degree 2; default is 0.
+
+        kernel_bw : float, optional
+            The bandwidth parameter in the Gaussian kernel function or the rational quadratic kernel function,
+            depending on kernel_type; default is 1.
+
+        """
+
+        if len(data.shape) == 1:
+            data = data.reshape(-1, 1)
         
-        # another draw
-        mc_samples = base_density.sample(batch_size)
-        mc_kernel_matrix = kernel_partial10_hatz(
-            data=data,
-            new_data=mc_samples,
-            kernel_function=kernel_function,
-            base_density=base_density)
-        unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
-        avg_norm_const2 = np.mean(unnorm_density_part)
-        sq_norm_const += np.sum(unnorm_density_part ** 2)
+        check_basedensity(base_density)
         
-        # update Monte Carlo estimation 
-        avg_norm_const = (avg_norm_const * batch_cnt + avg_norm_const2) / (batch_cnt + 1)
-        
-        error_norm = (np.sqrt(sq_norm_const / (batch_size * (batch_cnt + 1)) - avg_norm_const ** 2) / 
-                      np.sqrt(batch_size * (batch_cnt + 1)))
+        self.data = data
+        self.base_density = base_density
+
+        if kernel_type == 'gaussian_poly2':
     
-        batch_cnt += 1
-        
-        if print_error: 
-            print('normalizing constant error = {error:.7f}'.format(error=error_norm))
-    
-    normalizing_const = avg_norm_const
-    
-    if not normalizing_const_only: 
-        if print_error: 
-            print("#" * 45 + "\nApproximating the gradient of the log-partition now.")
-        
-        mc_samples = base_density.sample(batch_size)
-        mc_kernel_matrix = kernel_partial10_hatz(
-            data=data,
-            new_data=mc_samples,
-            kernel_function=kernel_function,
-            base_density=base_density)
-        density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
-        grad_est = (np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
-                              for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
-        sq_grad_est = (np.array([(mc_kernel_matrix[l1, :] * density_part) ** 2
-                                 for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
-        
-        error_grad = np.sqrt(np.sum(np.mean(sq_grad_est, axis=0) - grad_est ** 2)) / np.sqrt(batch_size)
-        
-        if print_error: 
-            print('gradient error = {error:.7f}'.format(error=error_grad))
-        
-        batch_cnt = 1
-        
-        while error_grad > tol_param: 
-            
-            # another draw
-            mc_samples = base_density.sample(batch_size)
-            mc_kernel_matrix = kernel_partial10_hatz(
+            kernel_function = GaussianPoly2(
                 data=data,
-                new_data=mc_samples,
-                kernel_function=kernel_function,
-                base_density=base_density)
-            density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
-            grad_est2 = np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
-                                  for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0]
-            sq_grad_est += (np.array([(mc_kernel_matrix[l1, :] * density_part) ** 2
-                                      for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
-            
-            grad_est = (grad_est * batch_cnt + grad_est2) / (batch_cnt + 1)
-            
-            error_grad = (np.sqrt(np.sum(np.mean(sq_grad_est, axis=0) / (batch_cnt + 1) - grad_est ** 2)) /
-                          np.sqrt(batch_size * (batch_cnt + 1)))
-            
-            batch_cnt += 1
-            
-            if print_error: 
-                print('gradient error = {error:.7f}'.format(error=error_grad))
-                
-        print(batch_cnt)
+                r1=kernel_r1,
+                r2=kernel_r2,
+                c=kernel_c,
+                bw=kernel_bw
+            )
     
-    if normalizing_const_only: 
-        return normalizing_const
-    else: 
-        return normalizing_const, grad_est
+            self.kernel_function = kernel_function
 
-
-def batch_montecarlo_params(mc_batch_size=1000, mc_tol=1e-2):
+        elif kernel_type == 'rationalquad_poly2':
     
-    """
-    Returns a dictionary of parameters for the batch Monte Carlo method
-    in approximating the log-partition function and its gradient.
-    
-    Parameters
-    ----------
-    mc_batch_size : int
-        The batch size in the batch Monte Carlo method; default is 1000.
-        
-    mc_tol : float
-        The floating point number below which sampling in the batch Monte Carlo is terminated; default is 1e-2.
-
-    Returns
-    -------
-    dict
-        The dictionary containing both supplied parameters.
-        
-    """
-
-    mc_batch_size = int(mc_batch_size)
-    
-    output = {"mc_batch_size": mc_batch_size,
-              "mc_tol": mc_tol}
-
-    return output
-
-
-def negloglik_optalgoparams(start_pt, step_size=0.01, max_iter=1e2, rel_tol=1e-5):
-    
-    """
-    Returns a dictionary of parameters used in minimizing the (penalized) negative log-likelihood loss function
-    by using the gradient descent algorithm.
-
-    Parameters
-    ----------
-    start_pt : numpy.ndarray
-        The starting point of the gradient descent algorithm to minimize
-        the penalized negative log-likelihood loss function.
-    
-    step_size : float or list or numpy.ndarray
-        The step size used in the gradient descent algorithm; default is 0.01.
-    
-    max_iter : int
-        The maximal number of iterations in the gradient descent algorithm; default is 100.
-    
-    rel_tol : float
-        The relative tolerance parameter to terminate the gradient descent algorithm in minimizing
-        the penalized negative log-likelihood loss function; default is 1e-5.
-
-    Returns
-    -------
-    dict
-        The dictionary containing all supplied parameters.
-
-    """
-
-    max_iter = int(max_iter)
-    
-    output = {"start_pt": start_pt,
-              "step_size": step_size,
-              "max_iter": max_iter,
-              "rel_tol": rel_tol}
-
-    return output
-
-
-def negloglik_smbasis_coef(data, kernel_function, base_density, lambda_param,
-                           optalgo_params, batchmc_params,
-                           batch_mc=True, batch_mc_se=False, print_error=True):
-    
-    """
-    Returns the solution to minimizing the penalized negative log-likelihood loss function
-    using the basis functions in the score matching density estimator.
-    The underlying minimization algorithm is the gradient descent algorithm.
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The array of observations whose density function is to be estimated.
-    
-    kernel_function : kernel_function object
-        The kernel function used to estimate the probability density function.
-        __type__ must be 'kernel_function'.
-        
-    base_density : base_density object
-        The base density function used to estimate the probability density function.
-        __type__ must be 'base_density'.
-    
-    lambda_param : float
-        The penalty parameter. Must be non-negative.
-    
-    optalgo_params : dict
-        The dictionary of parameters to control the gradient descent algorithm.
-        Must be returned from the function negloglik_penalized_optalgoparams.
-        
-    batchmc_params : dict
-        The dictionary of parameters to control the batch Monte Carlo method
-        to approximate the log-partition function and its gradient.
-        Must be returned from the function batch_montecarlo_params.
-    
-    batch_mc : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the relative difference of two consecutive approximations; default is True.
-    
-    batch_mc_se : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the standard deviation of approximations; default is False.
-    
-    print_error : bool, optional
-        Whether to print the error of the gradient descent algorithm at each iteration; default is True.
-    
-    Returns
-    -------
-    numpy.ndarray
-        An array of coefficients for the natural parameter in the penalized negative log-likelihood density estimate.
-    
-    """
-    
-    check_kernelfunction(kernel_function)
-    check_basedensity(base_density)
-    
-    if lambda_param < 0.:
-        raise ValueError("The lambda_param cannot be negative.")
-    
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)
-        
-    N, d = data.shape
-
-    # parameters associated with gradient descent algorithm 
-    start_pt = optalgo_params["start_pt"]
-    step_size = optalgo_params["step_size"]
-    max_iter = optalgo_params["max_iter"]
-    rel_tol = optalgo_params["rel_tol"]
-    
-    if type(step_size) not in [float, list, np.ndarray]:
-        raise TypeError(("The type of step_size in optalgo_params should be one of float, list or numpy ndarray, "
-                         "but got {}".format(type(step_size))))
-    
-    if isinstance(step_size, list) or isinstance(step_size, np.ndarray):
-        warnings.warn(("The step_size you supplied in optalgo_params is a {}, "
-                       "and will be reset to be the smallest positive number therein.").format(type(step_size)))
-        step_size = np.array(step_size)
-        step_size = np.min(step_size[step_size > 0.])
-    
-    if step_size <= 0.:
-        raise ValueError("The step_size in optalgo_params must be strictly positive, but got {}.".format(step_size))
-    
-    if len(start_pt) != N * d + 1:
-        raise ValueError(("The supplied start_pt in optalgo_params is not correct. "
-                          "The expected length of start_pt is {exp_len}, but got {act_len}.").format(
-            exp_len=N * d + 1, act_len=len(start_pt)))
-    
-    # parameters associated with batch Monte Carlo estimation
-    mc_batch_size = batchmc_params["mc_batch_size"]
-    mc_tol = batchmc_params["mc_tol"]
-
-    # the gradient of the loss function is
-    # nabla L (alpha) = nabla A (alpha) - (1 / N) gram_matrix boldone_N + lambda_param * gram_matrix * alpha
-    # where N = data.shape[0]
-    # the gradient descent update is
-    # new_iter = current_iter - step_size * nabla L (alpha)
-
-    # nabla f (x) part, x is from training data
-    f_matrix = kernel_partial10_hatz(data=data,
-                                     new_data=data,
-                                     kernel_function=kernel_function,
-                                     base_density=base_density)
-    
-    grad_term2 = f_matrix.mean(axis=1, keepdims=True)
-    
-    # nabla rkhs_norm_sq f, lambda f
-    rkhs_norm2_mat = sq_rkhs_norm_matrix(data=data,
-                                         kernel_function=kernel_function,
-                                         base_density=base_density)
-
-    current_iter = start_pt.reshape(-1, 1)
-
-    # compute the gradient of the log-partition function at current_iter
-    if batch_mc: 
-                  
-        mc_output1, mc_output2 = negloglik_smbasis_grad_logpar_batchmc(
-            data=data,
-            kernel_function=kernel_function,
-            base_density=base_density,
-            coef=current_iter,
-            batch_size=mc_batch_size,
-            tol_param=mc_tol,
-            normalizing_const_only=False,
-            print_error=False)
-        
-        grad_logpar = mc_output2.reshape(-1, 1)
-    
-    elif batch_mc_se: 
-        
-        mc_output1, mc_output2 = negloglik_smbasis_grad_logpar_batchmc_se(
-            data=data,
-            kernel_function=kernel_function,
-            base_density=base_density,
-            coef=current_iter,
-            batch_size=mc_batch_size,
-            tol_param=mc_tol,
-            normalizing_const_only=False,
-            print_error=False)
-        
-        grad_logpar = mc_output2.reshape(-1, 1)
-        
-    else: 
-        raise NotImplementedError(("In order to approximate the gradient of the log-partition function, "
-                                   "exactly one of 'batch_mc' and 'batch_mc_se' must be set True."))
-    
-    # compute the gradient of the loss function
-    current_grad = grad_logpar - grad_term2 + lambda_param * np.matmul(rkhs_norm2_mat, current_iter)
-    
-    # compute the updated iter
-    new_iter = current_iter - step_size * current_grad
-    
-    # compute the error of the first update
-    grad0_norm = np.linalg.norm(current_grad, 2)
-    error = grad0_norm / grad0_norm
-    # np.linalg.norm(new_iter - current_iter, 2) / (np.linalg.norm(current_iter, 2) + 1e-1)
-
-    iter_num = 1
-
-    if print_error:
-        print("Iter = {iter_num}, GradNorm = {gradnorm}, Relative Error = {error}".format(
-            iter_num=iter_num, gradnorm=grad0_norm, error=error))
-
-    while error > rel_tol and iter_num < max_iter:
-        
-        current_iter = new_iter
-        
-        # compute the gradient at current_iter
-        if batch_mc: 
-            
-            mc_output1, mc_output2 = negloglik_smbasis_grad_logpar_batchmc(
+            kernel_function = RationalQuadPoly2(
                 data=data,
-                kernel_function=kernel_function,
-                base_density=base_density,
-                coef=current_iter,
-                batch_size=mc_batch_size,
-                tol_param=mc_tol,
-                normalizing_const_only=False,
-                print_error=False)
-            
-            grad_logpar = mc_output2.reshape(-1, 1)
-        
-        elif batch_mc_se: 
-            
-            mc_output1, mc_output2 = negloglik_smbasis_grad_logpar_batchmc_se(
-                data=data,
-                kernel_function=kernel_function,
-                base_density=base_density,
-                coef=current_iter,
-                batch_size=mc_batch_size,
-                tol_param=mc_tol,
-                normalizing_const_only=False,
-                print_error=False)
-            
-            grad_logpar = mc_output2.reshape(-1, 1)
-            
+                r1=kernel_r1,
+                r2=kernel_r2,
+                c=kernel_c,
+                bw=kernel_bw
+            )
+    
+            self.kernel_function = kernel_function
+
         else:
+    
+            raise ValueError(f"kernel_type must be one of 'gaussian_poly2' and 'rationalquad_poly2, "
+                             f"but got{kernel_type}'.")
+
+    def grad_logpar_batchmc(self, coef, batch_size, tol_param, compute_grad=True, print_error=False):
+    
+        """
+        Approximates the partition function and the gradient of the log-partition function at coef
+        using the same basis functions as those in the score matching density estimator.
+        The approximation method used is the batch Monte Carlo method.
+        Terminate the sampling process until the relative difference of two consecutive approximations is
+        less than tol_param.
+
+        Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
+        The partition function evaluated at coef is approximated by
+        (1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) ),
+        and the gradient of the log-partition function evaluated at coef is approximated by
+        (1 / M) sum_{j=1}^M phi_l (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A(coef)), for all l = 1, ..., N,
+        where A(coef) is the log-partition function at coef.
+
+        Parameters
+        ----------
+        coef : numpy.ndarray
+            The array of coefficients at which the partition function
+            and the gradient of the log-partition function are approximated.
+
+        batch_size : int
+            The batch size in the batch Monte Carlo method.
+
+        tol_param : float
+            The floating point number below which sampling in the batch Monte Carlo is terminated.
+            The smaller the tol_param is, the more accurate the approximations are.
+
+        compute_grad : bool, optional
+            Whether to approximate the gradient of the log-partition function at coef; default is True.
+
+        print_error : bool, optional
+            Whether to print the error in the batch Monte Carlo method; default is False.
+
+        Returns
+        -------
+        float
+            The approximation of the partition function evaluated at coef.
+
+        numpy.ndarray
+            The approximation of the gradient of the log-partition function evaluated at coef;
+            only returns when compute_grad is True.
+
+        """
+    
+        N, d = self.data.shape
+        coef_len = N * d + 1
+    
+        if len(coef) != coef_len:
+            raise ValueError("The length of coef is incorrect, which should be {l}.".format(l=coef_len))
+    
+        ###########################################################################
+        # estimate the normalizing constant
+        # first drawing
+        mc_samples1 = self.base_density.sample(batch_size)
+        mc_kernel_matrix1 = kernel_partial10_hatz(
+            data=self.data,
+            new_data=mc_samples1,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+        unnorm_density_part1 = np.exp(np.matmul(mc_kernel_matrix1.T, coef))
+        norm_const1 = np.mean(unnorm_density_part1)
+    
+        # second drawing
+        mc_samples2 = self.base_density.sample(batch_size)
+        mc_kernel_matrix2 = kernel_partial10_hatz(
+            data=self.data,
+            new_data=mc_samples2,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+        unnorm_density_part2 = np.exp(np.matmul(mc_kernel_matrix2.T, coef))
+        norm_const2 = np.mean(unnorm_density_part2)
+    
+        norm_est_old = norm_const1
+        norm_est_new = (norm_const1 + norm_const2) / 2
+    
+        error_norm = np.abs(norm_est_old - norm_est_new) / norm_est_old
+    
+        if print_error:
+            print('normalizing constant error = {error:.7f}'.format(error=error_norm))
+    
+        batch_cnt = 2
+    
+        while error_norm > tol_param:
+        
+            norm_est_old = norm_est_new
+        
+            # another draw
+            mc_samples = self.base_density.sample(batch_size)
+            mc_kernel_matrix = kernel_partial10_hatz(
+                data=self.data,
+                new_data=mc_samples,
+                kernel_function=self.kernel_function,
+                base_density=self.base_density)
+            unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
+            norm_const2 = np.mean(unnorm_density_part)
+        
+            # update the Monte Carlo estimation
+            norm_est_new = (norm_est_old * batch_cnt + norm_const2) / (batch_cnt + 1)
+        
+            batch_cnt += 1
+        
+            error_norm = np.abs(norm_est_old - norm_est_new) / norm_est_old
+        
+            if print_error:
+                print('normalizing constant error = {error:.7f}'.format(error=error_norm))
+    
+        normalizing_const = norm_est_new
+    
+        if compute_grad:
+        
+            if print_error:
+                print("#" * 45 + "\nEstimating the gradient of the log-partition now.")
+        
+            mc_samples1 = self.base_density.sample(batch_size)
+            mc_kernel_matrix1 = kernel_partial10_hatz(
+                data=self.data,
+                new_data=mc_samples1,
+                kernel_function=self.kernel_function,
+                base_density=self.base_density)
+            density_part1 = np.exp(np.matmul(mc_kernel_matrix1.T, coef).flatten()) / normalizing_const
+            exp_est1 = np.array([np.mean(mc_kernel_matrix1[l1, :] * density_part1)
+                                 for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
+        
+            mc_samples2 = self.base_density.sample(batch_size)
+            mc_kernel_matrix2 = kernel_partial10_hatz(
+                data=self.data,
+                new_data=mc_samples2,
+                kernel_function=self.kernel_function,
+                base_density=self.base_density)
+            density_part2 = np.exp(np.matmul(mc_kernel_matrix2.T, coef).flatten()) / normalizing_const
+            exp_est2 = np.array([np.mean(mc_kernel_matrix2[l1, :] * density_part2)
+                                 for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
+        
+            grad_est_old = exp_est1
+            grad_est_new = (exp_est1 + exp_est2) / 2
+        
+            error_grad = np.linalg.norm(grad_est_old - grad_est_new, 2) / (np.linalg.norm(grad_est_old, 2) * N)
+        
+            if print_error:
+                print('gradient error = {error:.7f}'.format(error=error_grad))
+        
+            batch_cnt = 2
+        
+            while error_grad > tol_param:
             
-            raise NotImplementedError(("In order to approximate the gradient of the log-partition function, "
-                                       "exactly one of 'batch_mc' and 'batch_mc_se' must be set True."))
+                grad_est_old = grad_est_new
+            
+                # another draw
+                mc_samples = self.base_density.sample(batch_size)
+                mc_kernel_matrix = kernel_partial10_hatz(
+                    data=self.data,
+                    new_data=mc_samples,
+                    kernel_function=self.kernel_function,
+                    base_density=self.base_density)
+                density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
+                exp_est2 = np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
+                                     for l1 in range(coef_len)]).astype(np.float64).reshape(1, -1)[0]
+            
+                grad_est_new = (grad_est_old * batch_cnt + exp_est2) / (batch_cnt + 1)
+            
+                batch_cnt += 1
+            
+                error_grad = np.linalg.norm(grad_est_old - grad_est_new, 2) / (np.linalg.norm(grad_est_old, 2) * N)
+            
+                if print_error:
+                    print('gradient error = {error:.7f}'.format(error=error_grad))
+    
+        if not compute_grad:
+            return normalizing_const
+        else:
+            return normalizing_const, grad_est_new
+
+    def grad_logpar_batchmc_se(self, coef, batch_size, tol_param, compute_grad=True, print_error=False):
+    
+        """
+        Approximates the partition function and the gradient of the log-partition function at coef
+        using the same basis functions as those in the score matching density estimator.
+        The approximation method used is the batch Monte Carlo method.
+        Terminate the sampling process until the standard deviation of the approximations is
+        less than tol_param.
+
+        Let phi_1, ..., phi_N be the basis functions and Y_1, ..., Y_M be random samples from the base density.
+        The partition function evaluated at coef is approximated by
+        (1 / M) sum_{j=1}^M exp ( sum_{i=1}^N coef[i] phi_i (Y_j) ),
+        and the gradient of the log-partition function evaluated at coef is approximated by
+        (1 / M) sum_{j=1}^M phi_i (Y_j) exp ( sum_{i=1}^N coef[i] phi_i (Y_j) - A(coef)), for all i = 1, ..., N,
+        where A(coef) is the log-partition function at coef.
+
+        Parameters
+        ----------
+        coef : numpy.ndarray
+            The array of coefficients at which the partition function and
+            the gradient of the log-partition function are approximated.
+
+        batch_size : int
+            The batch size in the batch Monte Carlo method.
+
+        tol_param : float
+            The floating point number below which sampling in the batch Monte Carlo is terminated.
+            The smaller the tol_param is, the more accurate the approximations are.
+
+        compute_grad : bool, optional
+            Whether to approximate the gradient of the log-partition function; default is True.
+
+        print_error : bool, optional
+            Whether to print the error in the batch Monte Carlo method; default is False.
+
+        Returns
+        -------
+        float
+            The approximation of the log-partition function evaluated at coef.
+
+        numpy.ndarray
+            The approximation of the gradient of the log-partition function evaluated at coef;
+            only returns when compute_grad is True.
+
+        """
+    
+        N, d = self.data.shape
+        coef_len = N * d + 1
+    
+        if len(coef) != coef_len:
+            raise ValueError("The length of coef is incorrect, which should be {l}.".format(l=coef_len))
+    
+        ###########################################################################
+        # estimate the normalizing constant
+        # first drawing
+        mc_samples = self.base_density.sample(batch_size)
+        mc_kernel_matrix = kernel_partial10_hatz(
+            data=self.data,
+            new_data=mc_samples,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+        unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
+        avg_norm_const = np.mean(unnorm_density_part)
+        sq_norm_const = np.sum(unnorm_density_part ** 2)
+    
+        error_norm = np.sqrt(sq_norm_const / batch_size - avg_norm_const ** 2) / np.sqrt(batch_size)
+    
+        if print_error:
+            print('normalizing constant error = {error:.7f}'.format(error=error_norm))
+    
+        batch_cnt = 1
+    
+        while error_norm > tol_param:
+        
+            # another draw
+            mc_samples = self.base_density.sample(batch_size)
+            mc_kernel_matrix = kernel_partial10_hatz(
+                data=self.data,
+                new_data=mc_samples,
+                kernel_function=self.kernel_function,
+                base_density=self.base_density)
+            unnorm_density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef))
+            avg_norm_const2 = np.mean(unnorm_density_part)
+            sq_norm_const += np.sum(unnorm_density_part ** 2)
+        
+            # update Monte Carlo estimation
+            avg_norm_const = (avg_norm_const * batch_cnt + avg_norm_const2) / (batch_cnt + 1)
+        
+            error_norm = (np.sqrt(sq_norm_const / (batch_size * (batch_cnt + 1)) - avg_norm_const ** 2) /
+                          np.sqrt(batch_size * (batch_cnt + 1)))
+        
+            batch_cnt += 1
+        
+            if print_error:
+                print('normalizing constant error = {error:.7f}'.format(error=error_norm))
+    
+        normalizing_const = avg_norm_const
+    
+        if compute_grad:
+            if print_error:
+                print("#" * 45 + "\nApproximating the gradient of the log-partition now.")
+        
+            mc_samples = self.base_density.sample(batch_size)
+            mc_kernel_matrix = kernel_partial10_hatz(
+                data=self.data,
+                new_data=mc_samples,
+                kernel_function=self.kernel_function,
+                base_density=self.base_density)
+            density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
+            grad_est = (np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
+                                  for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
+            sq_grad_est = (np.array([(mc_kernel_matrix[l1, :] * density_part) ** 2
+                                     for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
+        
+            error_grad = np.sqrt(np.sum(np.mean(sq_grad_est, axis=0) - grad_est ** 2)) / np.sqrt(batch_size)
+        
+            if print_error:
+                print('gradient error = {error:.7f}'.format(error=error_grad))
+        
+            batch_cnt = 1
+        
+            while error_grad > tol_param:
+            
+                # another draw
+                mc_samples = self.base_density.sample(batch_size)
+                mc_kernel_matrix = kernel_partial10_hatz(
+                    data=self.data,
+                    new_data=mc_samples,
+                    kernel_function=self.kernel_function,
+                    base_density=self.base_density)
+                density_part = np.exp(np.matmul(mc_kernel_matrix.T, coef).flatten()) / normalizing_const
+                grad_est2 = np.array([np.mean(mc_kernel_matrix[l1, :] * density_part)
+                                      for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0]
+                sq_grad_est += (np.array([(mc_kernel_matrix[l1, :] * density_part) ** 2
+                                          for l1 in range(coef_len)]).astype(np.float32).reshape(1, -1)[0])
+            
+                grad_est = (grad_est * batch_cnt + grad_est2) / (batch_cnt + 1)
+            
+                error_grad = (np.sqrt(np.sum(np.mean(sq_grad_est, axis=0) / (batch_cnt + 1) - grad_est ** 2)) /
+                              np.sqrt(batch_size * (batch_cnt + 1)))
+            
+                batch_cnt += 1
+            
+                if print_error:
+                    print('gradient error = {error:.7f}'.format(error=error_grad))
+        
+            print(batch_cnt)
+    
+        if not compute_grad:
+            return normalizing_const
+        else:
+            return normalizing_const, grad_est
+
+    def coef(self, data, lambda_param, optalgo_params, batchmc_params, batch_mc=True, print_error=True):
+    
+        """
+        Returns the solution that minimizes the penalized negative log-likelihood loss function
+        using the same basis functions as those in the score matching density estimator.
+        The underlying minimization algorithm is the gradient descent algorithm.
+
+        Parameters
+        ----------
+        data : numpy.ndarray
+            The data used to estimate the probability density function.
+            This data may be different from self.data, especially in applying the cross validation.
+            
+        lambda_param : float
+            The penalty parameter. Must be non-negative.
+
+        optalgo_params : dict
+            The dictionary of parameters to control the gradient descent algorithm.
+            Must be returned from the function negloglik_optalgo_params.
+
+        batchmc_params : dict
+            The dictionary of parameters to control the batch Monte Carlo method
+            to approximate the log-partition function and its gradient.
+            Must be returned from the function batch_montecarlo_params.
+
+        batch_mc : bool, optional
+            Whether to use the batch Monte Carlo method with the termination criterion
+            being the relative difference of two consecutive approximations; default is True.
+            If it is False, the batch Monte Carlo method with the termination criterion
+            being the standard deviation of the approximations will be used.
+
+        print_error : bool, optional
+            Whether to print the error of the gradient descent algorithm at each iteration; default is True.
+
+        Returns
+        -------
+        numpy.ndarray
+            An array of coefficients for the natural parameter
+            in the penalized negative log-likelihood density estimate.
+
+        """
+        
+        if len(data.shape) == 1:
+            data = data.reshape(-1, 1)
+        
+        if data.shape[1] != self.data.shape[1]:
+            raise ValueError('The dimensionality of data provided and that of self.data do not match.')
+    
+        if lambda_param < 0.:
+            raise ValueError("The lambda_param cannot be negative.")
+    
+        N, d = self.data.shape
+    
+        # parameters associated with gradient descent algorithm
+        start_pt = optalgo_params["start_pt"]
+        step_size = optalgo_params["step_size"]
+        max_iter = optalgo_params["max_iter"]
+        rel_tol = optalgo_params["rel_tol"]
+        abs_tol = optalgo_params["abs_tol"]
+
+        if not isinstance(step_size, float):
+            raise TypeError(("The type of step_size in optalgo_params should be float, "
+                             "but got {}".format(type(step_size))))
+    
+        if step_size <= 0.:
+            raise ValueError("The step_size in optalgo_params must be strictly positive, but got {}.".format(step_size))
+    
+        if len(start_pt) != N * d + 1:
+            raise ValueError(("The supplied start_pt in optalgo_params is not correct. "
+                              "The expected length of start_pt is {exp_len}, but got {act_len}.").format(
+                exp_len=N * d + 1, act_len=len(start_pt)))
+    
+        # parameters associated with batch Monte Carlo estimation
+        mc_batch_size = batchmc_params["mc_batch_size"]
+        mc_tol = batchmc_params["mc_tol"]
+    
+        # the gradient of the loss function is
+        # nabla L (alpha) = nabla A (alpha) - (1 / N) gram_matrix boldone_N + lambda_param * gram_matrix * alpha
+        # where N = data.shape[0]
+        # the gradient descent update is
+        # new_iter = current_iter - step_size * nabla L (alpha)
+    
+        # nabla f (x) part, x is from training data
+        f_matrix = kernel_partial10_hatz(
+            data=self.data,
+            new_data=data,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+    
+        grad_term2 = f_matrix.mean(axis=1, keepdims=True)
+    
+        # nabla rkhs_norm_sq f, lambda f
+        rkhs_norm2_mat = sq_rkhs_norm_matrix(
+            data=self.data,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+    
+        current_iter = start_pt.reshape(-1, 1)
+    
+        # compute the gradient of the log-partition function at current_iter
+        if batch_mc:
+        
+            mc_output1, mc_output2 = self.grad_logpar_batchmc(
+                coef=current_iter,
+                batch_size=mc_batch_size,
+                tol_param=mc_tol,
+                compute_grad=True,
+                print_error=False)
+        
+            grad_logpar = mc_output2.reshape(-1, 1)
+    
+        else:
+        
+            mc_output1, mc_output2 = self.grad_logpar_batchmc_se(
+                coef=current_iter,
+                batch_size=mc_batch_size,
+                tol_param=mc_tol,
+                compute_grad=True,
+                print_error=False)
+        
+            grad_logpar = mc_output2.reshape(-1, 1)
         
         # compute the gradient of the loss function
         current_grad = grad_logpar - grad_term2 + lambda_param * np.matmul(rkhs_norm2_mat, current_iter)
-
+    
         # compute the updated iter
         new_iter = current_iter - step_size * current_grad
-
+    
         # compute the error of the first update
-        grad_new_norm = np.linalg.norm(current_grad, 2)
-        error = grad_new_norm / grad0_norm
+        grad0_norm = np.linalg.norm(current_grad, 2)
+        grad_new_norm = grad0_norm
+        error = grad0_norm / grad0_norm
         # np.linalg.norm(new_iter - current_iter, 2) / (np.linalg.norm(current_iter, 2) + 1e-1)
-
-        iter_num += 1
-
+    
+        iter_num = 1
+    
         if print_error:
             print("Iter = {iter_num}, GradNorm = {gradnorm}, Relative Error = {error}".format(
-                iter_num=iter_num, gradnorm=grad_new_norm, error=error))
-
-    coefficients = new_iter
-
-    return coefficients
-
-
-def negloglik_smbasis_loss_function(data, new_data, kernel_function, base_density, coef, batchmc_params, 
-                                    batch_mc=True, batch_mc_se=False):
+                iter_num=iter_num, gradnorm=grad0_norm, error=error))
     
-    """
-    Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
-    A (f) - (1 / n) sum_{j=1}^n f (Y_j),
-    where the natural parameter f is determined by data and coef and is equal to sum_{i=1}^N coef[i] phi_i,
-    phi_1, ..., phi_N are the basis functions in score matching density estimator,
-    and Y_1, ..., Y_n are new_data.
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The array of observations whose density function is to be estimated.
-    
-    new_data : numpy.ndarray
-        The array of data at which the negative log-likelihood loss function is to be evaluated.
+        while error > rel_tol and grad_new_norm > abs_tol and iter_num < max_iter:
         
-    kernel_function : kernel_function object
-        The kernel function used to estimate the probability density function.
-        __type__ must be 'kernel_function'.
+            current_iter = new_iter
         
-    base_density : base_density object
-        The base density function used to estimate the probability density function.
-        __type__ must be 'base_density'.
-    
-    coef : numpy.ndarray
-        The array of coefficients at which the log-partition function and its gradient are evaluated.
-        Must be of shape (data.shape[0] * data.shape[1] + 1, 1).
-        
-    batchmc_params : dict
-        The dictionary of parameters to control the batch Monte Carlo method
-        to approximate the log-partition function and its gradient.
-        Must be returned from the function batch_montecarlo_params.
-    
-    batch_mc : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the relative difference of two consecutive approximations; default is True.
-    
-    batch_mc_se : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the standard deviation of approximations; default is False.
-    
-    Returns
-    -------
-    float
-        The value of the negative log-likelihood loss function evaluated at coef and on new_data.
-        
-    """
-    
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)
-
-    N, d = data.shape
-    coef = coef.reshape(-1, 1)
-    
-    if coef.shape[0] != N * d + 1: 
-        raise ValueError(("The supplied coef is not correct. "
-                          "The expected length of coef is {exp_len}, but got {act_len}.").format(
-            exp_len=N * d + 1, act_len=len(coef)))
-    
-    mc_batch_size = batchmc_params["mc_batch_size"]
-    mc_tol = batchmc_params["mc_tol"]
-
-    # compute A(f)
-    if batch_mc: 
-                  
-        mc_output1 = negloglik_smbasis_grad_logpar_batchmc(
-            data=data,
-            kernel_function=kernel_function,
-            base_density=base_density,
-            coef=coef,
-            batch_size=mc_batch_size,
-            tol_param=mc_tol,
-            normalizing_const_only=True,
-            print_error=False)
-    
-    elif batch_mc_se: 
-        
-        mc_output1 = negloglik_smbasis_grad_logpar_batchmc_se(
-            data=data,
-            kernel_function=kernel_function,
-            base_density=base_density,
-            coef=coef,
-            batch_size=mc_batch_size,
-            tol_param=mc_tol,
-            normalizing_const_only=True,
-            print_error=False)
-        
-    else:
-        
-        raise NotImplementedError(("In order to approximate the gradient of the log-partition function, "
-                                   "exactly one of 'batch_mc' and 'batch_mc_se' must be set True."))
-    
-    norm_const = mc_output1
-    Af = np.log(norm_const)
-    
-    # compute (1 / n) sum_{j=1}^n f (Y_j), where Y_j is the j-th row of new_data
-    kernel_mat_new = kernel_partial10_hatz(data=data,
-                                           new_data=new_data,
-                                           kernel_function=kernel_function,
-                                           base_density=base_density)
-    avg_fx = np.mean(np.matmul(kernel_mat_new.T, coef))
-    
-    loss_val = Af - avg_fx
-    
-    return loss_val
-
-
-def negloglik_smbasis_penalized_optlambda(data, kernel_function, base_density,
-                                          lambda_cand, k_folds, print_error,
-                                          optalgo_params, batchmc_params,
-                                          save_dir, save_info=False, batch_mc=True, batch_mc_se=False):
-    
-    """
-    Selects the optimal penalty parameter in the penalized negative log-likelihood density estimation
-    using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
-    The basis functions of the natural parameter are the same as those of the score matching density estimator.
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The array of observations whose density function is to be estimated.
-        
-    kernel_function : kernel_function object
-        The kernel function used to estimate the probability density function.
-        __type__ must be 'kernel_function'.
-        
-    base_density : base_density object
-        The base density function used to estimate the probability density function.
-        __type__ must be 'base_density'.
-    
-    lambda_cand : list or 1-dimensional numpy.ndarray
-        The list of penalty parameter candidates. Each of them must be non-negative.
-    
-    k_folds : int
-        The number of folds for cross validation.
-    
-    print_error : bool
-        Whether to print the error of the gradient descent algorithm at each iteration.
-    
-    optalgo_params : dict
-        The dictionary of parameters to control the gradient descent algorithm.
-        Must be returned from the function negloglik_penalized_optalgoparams.
-        
-    batchmc_params : dict
-        The dictionary of parameters to control the batch Monte Carlo method
-        to approximate the log-partition function and its gradient.
-        Must be returned from the function batch_montecarlo_params.
-    
-    save_dir : str
-        The directory path to which the estimation information is saved; only works when save_info is True.
-    
-    save_info : bool, optional
-        Whether to save the estimation information, including the values of negative log-likelihood
-        loss function of each fold and the coefficient vector at the optimal penalty parameter, to a local file;
-        default is False.
-    
-    batch_mc : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the relative difference of two consecutive approximations; default is True.
-    
-    batch_mc_se : bool, optional
-        Whether to use the batch Monte Carlo method with the termination criterion
-        being the standard deviation of approximations; default is False.
-
-    Returns
-    -------
-    dict
-        A dictionary containing opt_lambda, the optimal penalty parameter, and
-        opt_coef, the coefficient vector at the optimal penalty parameter.
-    
-    """
-    
-    check_kernelfunction(kernel_function)
-    check_basedensity(base_density)
-    
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)
-    
-    # check the non-negativity of lambda_cand
-    lambda_cand = np.array(lambda_cand).flatten()
-    if np.any(lambda_cand < 0.):
-        raise ValueError("There exists at least one element in lambda_cand whose value is negative. Please modify.")
-    
-    N, d = data.shape
-    # coef_len = N * d + 1
-    n_lambda = len(lambda_cand)
-
-    # check the step size
-    step_size = optalgo_params['step_size']
-    if isinstance(step_size, float):
-    
-        warn_msg = ("The step_size in optalgo_params is a float, and will be used in computing "
-                    "density estimates for all {} different lambda values in lambda_cand."
-                    "It is better to supply a list or numpy.ndarray for step_size.").format(n_lambda)
-    
-        print(warn_msg)
-        
-        step_size = np.array([step_size] * n_lambda)
-        
-    elif isinstance(step_size, list):
-        
-        step_size = np.array(step_size)
-
-    if len(step_size) != n_lambda:
-        raise ValueError("The length of step_size in optalgo_params is not the same as that of lambda_cand.")
-    
-    # draw repeatedly from 0 to k_folds-1 of size N
-    folds_i = np.random.randint(low=0, high=k_folds, size=N)
-
-    nll_scores = np.zeros((n_lambda,), dtype=np.float64)
-    
-    if save_info:
-        f_log = open('%s/log.txt' % save_dir, 'w')
-
-    for j in range(n_lambda):
-
-        # initialize the loss score
-        score = 0.
-        lambda_param = lambda_cand[j]
-        
-        print("Lambda " + str(j) + ": " + str(lambda_param))
-        
-        if save_info:
-            f_log.write('lambda: %.8f, ' % lambda_param)
-
-        for i in range(k_folds):
-            # data split
-            train_data = data[folds_i != i, ]
-            test_data = data[folds_i == i, ]
+            # compute the gradient at current_iter
+            if batch_mc:
             
-            if kernel_function.kernel_type == "gaussian_poly2":
-                
-                kernel_function_sub = GaussianPoly2(train_data,
-                                                    r1=kernel_function.r1,
-                                                    r2=kernel_function.r2,
-                                                    c=kernel_function.c,
-                                                    bw=kernel_function.bw)
-                
-            elif kernel_function.kernel_type == "rationalquad_poly2":
-                
-                kernel_function_sub = RationalQuadPoly2(train_data,
-                                                        r1=kernel_function.r1,
-                                                        r2=kernel_function.r2,
-                                                        c=kernel_function.c,
-                                                        bw=kernel_function.bw)
-                
+                mc_output1, mc_output2 = self.grad_logpar_batchmc(
+                    coef=current_iter,
+                    batch_size=mc_batch_size,
+                    tol_param=mc_tol,
+                    compute_grad=True,
+                    print_error=False)
+            
+                grad_logpar = mc_output2.reshape(-1, 1)
+        
             else:
-                
-                raise NotImplementedError(("The kernel function should be one of 'gaussian_poly2' and "
-                                           "'rationalquad_poly2'."))
-                
-            # compute the coefficient vector for the given lambda
-            train_algo_control = negloglik_optalgoparams(
-                start_pt=np.zeros((train_data.shape[0] * train_data.shape[1] + 1, 1), dtype=np.float64),
-                step_size=float(step_size[j]),
-                max_iter=optalgo_params["max_iter"],
-                rel_tol=optalgo_params["rel_tol"])
             
-            coef = negloglik_smbasis_coef(
-                data=train_data,
-                kernel_function=kernel_function_sub,
-                base_density=base_density,
-                lambda_param=lambda_param,
-                optalgo_params=train_algo_control,
-                batchmc_params=batchmc_params,
-                batch_mc=batch_mc,
-                batch_mc_se=batch_mc_se,
-                print_error=print_error)
-                
-            score += negloglik_smbasis_loss_function(
-                data=train_data,
-                new_data=test_data,
-                kernel_function=kernel_function_sub,
-                base_density=base_density,
+                mc_output1, mc_output2 = self.grad_logpar_batchmc_se(
+                    coef=current_iter,
+                    batch_size=mc_batch_size,
+                    tol_param=mc_tol,
+                    compute_grad=True,
+                    print_error=False)
+            
+                grad_logpar = mc_output2.reshape(-1, 1)
+        
+            # compute the gradient of the loss function
+            current_grad = grad_logpar - grad_term2 + lambda_param * np.matmul(rkhs_norm2_mat, current_iter)
+        
+            # compute the updated iter
+            new_iter = current_iter - step_size * current_grad
+        
+            # compute the error of the first update
+            grad_new_norm = np.linalg.norm(current_grad, 2)
+            error = grad_new_norm / grad0_norm
+            # np.linalg.norm(new_iter - current_iter, 2) / (np.linalg.norm(current_iter, 2) + 1e-1)
+        
+            iter_num += 1
+        
+            if print_error:
+                print("Iter = {iter_num}, GradNorm = {gradnorm}, Relative Error = {error}".format(
+                    iter_num=iter_num, gradnorm=grad_new_norm, error=error))
+    
+        coefficients = new_iter
+    
+        return coefficients
+
+    def eval_loss_function(self, new_data, coef, batchmc_params, batch_mc=True):
+    
+        """
+        Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
+        A (f) - (1 / n) sum_{j=1}^n f (Y_j),
+        where the natural parameter f is equal to sum_{i=1}^N coef[i] phi_i,
+        phi_1, ..., phi_N are the same basis functions as those in score matching density estimator,
+        and Y_1, ..., Y_n are new_data.
+
+        Parameters
+        ----------
+        new_data : numpy.ndarray
+            The array of data at which the negative log-likelihood loss function is to be evaluated.
+
+        coef : numpy.ndarray
+            The array of coefficients at which the negative log-likelihood loss function is evaluated.
+            Must be of shape (data.shape[0] * data.shape[1] + 1, 1).
+
+        batchmc_params : dict
+            The dictionary of parameters to control the batch Monte Carlo method
+            to approximate the log-partition function and its gradient.
+            Must be returned from the function batch_montecarlo_params.
+
+        batch_mc : bool, optional
+            Whether to use the batch Monte Carlo method with the termination criterion
+            being the relative difference of two consecutive approximations; default is True.
+            If it is False, the batch Monte Carlo method with the termination criterion
+            being the standard deviation of the approximations will be used.
+
+        Returns
+        -------
+        float
+            The value of the negative log-likelihood loss function evaluated at coef and on new_data.
+
+        """
+
+        if len(new_data.shape) == 1:
+            new_data = new_data.reshape(-1, 1)
+
+        if self.data.shape[1] != new_data.shape[1]:
+            raise ValueError('The dimensionality of new_data and that of self.data do not match.')
+        
+        N, d = self.data.shape
+        coef = coef.reshape(-1, 1)
+    
+        if coef.shape[0] != N * d + 1:
+            raise ValueError(("The supplied coef is not correct. "
+                              "The expected length of coef is {exp_len}, but got {act_len}.").format(
+                exp_len=N * d + 1, act_len=len(coef)))
+    
+        mc_batch_size = batchmc_params["mc_batch_size"]
+        mc_tol = batchmc_params["mc_tol"]
+    
+        # compute A(f)
+        if batch_mc:
+        
+            mc_output1 = self.grad_logpar_batchmc(
                 coef=coef,
-                batchmc_params=batchmc_params,
-                batch_mc=batch_mc,
-                batch_mc_se=batch_mc_se)
+                batch_size=mc_batch_size,
+                tol_param=mc_tol,
+                compute_grad=False,
+                print_error=False)
+    
+        else:
+        
+            mc_output1 = self.grad_logpar_batchmc_se(
+                coef=coef,
+                batch_size=mc_batch_size,
+                tol_param=mc_tol,
+                compute_grad=False,
+                print_error=False)
             
-        nll_scores[j, ] = score / k_folds
+        norm_const = mc_output1
+        Af = np.log(norm_const)
+    
+        # compute (1 / n) sum_{j=1}^n f (Y_j), where Y_j is the j-th row of new_data
+        kernel_mat_new = kernel_partial10_hatz(
+            data=self.data,
+            new_data=new_data,
+            kernel_function=self.kernel_function,
+            base_density=self.base_density)
+        avg_fx = np.mean(np.matmul(kernel_mat_new.T, coef))
+    
+        loss_val = Af - avg_fx
+    
+        return loss_val
+
+    def penalized_optlambda(self, lambda_cand, k_folds, print_error, optalgo_params, batchmc_params,
+                            save_dir, save_info=False, batch_mc=True):
+    
+        """
+        Selects the optimal penalty parameter in the penalized negative log-likelihood density estimation
+        using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
+        The basis functions of the natural parameter are the same as those in the score matching density estimator.
+
+        Parameters
+        ----------
+        lambda_cand : list or 1-dimensional numpy.ndarray
+            The list of penalty parameter candidates. Each of them must be non-negative.
+
+        k_folds : int
+            The number of folds for cross validation.
+
+        print_error : bool
+            Whether to print the error of the gradient descent algorithm at each iteration.
+
+        optalgo_params : dict
+            The dictionary of parameters to control the gradient descent algorithm.
+            Must be returned from the function negloglik_optalg_oparams.
+
+        batchmc_params : dict
+            The dictionary of parameters to control the batch Monte Carlo method
+            to approximate the log-partition function and its gradient.
+            Must be returned from the function batch_montecarlo_params.
+
+        save_dir : str
+            The directory path to which the estimation information is saved; only works when save_info is True.
+
+        save_info : bool, optional
+            Whether to save the estimation information, including the values of negative log-likelihood
+            loss function of each fold and the coefficient vector at the optimal penalty parameter, to a local file;
+            default is False.
+
+        batch_mc : bool, optional
+            Whether to use the batch Monte Carlo method with the termination criterion
+            being the relative difference of two consecutive approximations; default is True.
+            If it is False, the batch Monte Carlo method with the termination criterion
+            being the standard deviation of the approximations will be used.
+
+        Returns
+        -------
+        dict
+            A dictionary containing opt_lambda, the optimal penalty parameter, and
+            opt_coef, the coefficient vector at the optimal penalty parameter.
+
+        """
+    
+        # check the non-negativity of lambda_cand
+        lambda_cand = np.array(lambda_cand).flatten()
+        if np.any(lambda_cand < 0.):
+            raise ValueError("There exists at least one element in lambda_cand whose value is negative. Please modify.")
+    
+        N, d = self.data.shape
+        coef_len = N * d + 1
+        n_lambda = len(lambda_cand)
+    
+        # check the step size
+        step_size = optalgo_params['step_size']
+        if isinstance(step_size, float):
+        
+            warn_msg = ("The step_size in optalgo_params is a float, and will be used in computing "
+                        "density estimates for all {} different lambda values in lambda_cand."
+                        "It is better to supply a list or numpy.ndarray for step_size.").format(n_lambda)
+        
+            print(warn_msg)
+        
+            step_size = np.array([step_size] * n_lambda)
+    
+        elif isinstance(step_size, list):
+        
+            step_size = np.array(step_size)
+    
+        if len(step_size) != n_lambda:
+            raise ValueError("The length of step_size in optalgo_params is not the same as that of lambda_cand.")
+    
+        # draw repeatedly from 0 to k_folds-1 of size N
+        folds_i = np.random.randint(low=0, high=k_folds, size=N)
+    
+        nll_scores = np.zeros((n_lambda,), dtype=np.float64)
+    
         if save_info:
-            f_log.write('score: %.8f\n' % nll_scores[j, ])
+            f_log = open('%s/log.txt' % save_dir, 'w')
     
-    if save_info:
-        f_log.close()
+        for j in range(n_lambda):
+        
+            # initialize the loss score
+            score = 0.
+            lambda_param = lambda_cand[j]
+        
+            print("Lambda " + str(j) + ": " + str(lambda_param))
+        
+            if save_info:
+                f_log.write('lambda: %.8f, ' % lambda_param)
+        
+            for i in range(k_folds):
+                # data split
+                train_data = self.data[folds_i != i, ]
+                test_data = self.data[folds_i == i, ]
+            
+                # compute the coefficient vector for the given lambda
+                train_algo_control = negloglik_optalgo_params(
+                    start_pt=np.zeros((coef_len, 1), dtype=np.float64),
+                    step_size=float(step_size[j]),
+                    max_iter=optalgo_params["max_iter"],
+                    rel_tol=optalgo_params["rel_tol"])
+            
+                coef = self.coef(
+                    data=train_data,
+                    lambda_param=lambda_param,
+                    optalgo_params=train_algo_control,
+                    batchmc_params=batchmc_params,
+                    batch_mc=batch_mc,
+                    print_error=print_error)
+            
+                score += self.eval_loss_function(
+                    new_data=test_data,
+                    coef=coef,
+                    batchmc_params=batchmc_params,
+                    batch_mc=batch_mc)
+        
+            nll_scores[j, ] = score / k_folds
+            if save_info:
+                f_log.write('score: %.8f\n' % nll_scores[j, ])
     
-    cv_result = {np.round(x, 5): np.round(y, 10) for x, y in zip(lambda_cand, nll_scores)}
-    print("The cross validation scores are:\n" + str(cv_result))
+        if save_info:
+            f_log.close()
     
-    # find the optimal penalty parameter
-    opt_lambda = lambda_cand[np.argmin(nll_scores)]
-    print("=" * 50)
-    print("The optimal penalty parameter is {}.".format(opt_lambda))
-    print("=" * 50 + "\nFinal run with the optimal lambda.")
-
-    # compute the coefficient vector at the optimal penalty parameter
-    optalgo_params['step_size'] = float(step_size[np.argmin(nll_scores)])
-    opt_coef = negloglik_smbasis_coef(
-        data=data,
-        kernel_function=kernel_function,
-        base_density=base_density,
-        lambda_param=opt_lambda,
-        optalgo_params=optalgo_params,
-        batchmc_params=batchmc_params,
-        batch_mc=batch_mc,
-        batch_mc_se=batch_mc_se,
-        print_error=print_error)
+        cv_result = {np.round(x, 5): np.round(y, 10) for x, y in zip(lambda_cand, nll_scores)}
+        print("The cross validation scores are:\n" + str(cv_result))
     
-    if save_info:
-        f_optcoef = open('%s/negloglik_optcoef.npy' % save_dir, 'wb')
-        np.save(f_optcoef, opt_coef)
-        f_optcoef.close()
-
-    output = {"opt_lambda": opt_lambda,
-              "opt_coef": opt_coef}
-
-    return output
+        # find the optimal penalty parameter
+        opt_lambda = lambda_cand[np.argmin(nll_scores)]
+        print("=" * 50)
+        print("The optimal penalty parameter is {}.".format(opt_lambda))
+        print("=" * 50 + "\nFinal run with the optimal lambda.")
+    
+        # compute the coefficient vector at the optimal penalty parameter
+        optalgo_params['step_size'] = float(step_size[np.argmin(nll_scores)])
+        opt_coef = self.coef(
+            data=self.data,
+            lambda_param=opt_lambda,
+            optalgo_params=optalgo_params,
+            batchmc_params=batchmc_params,
+            batch_mc=batch_mc,
+            print_error=print_error)
+    
+        if save_info:
+            f_optcoef = open('%s/negloglik_optcoef.npy' % save_dir, 'wb')
+            np.save(f_optcoef, opt_coef)
+            f_optcoef.close()
+    
+        output = {"opt_lambda": opt_lambda,
+                  "opt_coef": opt_coef}
+    
+        return output
