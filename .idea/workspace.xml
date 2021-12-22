@@ -6,11 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="abaf92d8-7d6e-400e-978d-17a897043246" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/negloglik_grid_points.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_grid_points.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/negloglik_gubasis.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_gubasis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/negloglik_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/negloglik_scorematchingbasis.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_scorematchingbasis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/density_estimation_1d_geyser-Copy1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/density_estimation_1d_geyser-Copy1.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
