@@ -447,7 +447,7 @@ class NegLogLikGuBasis:
     
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
     
         batch_mc : bool, optional
@@ -623,12 +623,12 @@ class NegLogLikGuBasis:
             The array of data at which the negative log-likelihood loss function is to be evaluated.
             
         coef : numpy.ndarray
-            The array of coefficients at which the log-partition function and its gradient are evaluated.
+            The array of coefficients at which the negative log-likelihood loss function is to be evaluated.
             Must be of shape (data.shape[0] * data.shape[1] + 1, 1).
             
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
         
         batch_mc : bool, optional
@@ -722,7 +722,7 @@ class NegLogLikGuBasis:
             
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
         
         save_dir : str
