@@ -7,7 +7,7 @@ def kernel_partial10_hatz(data, new_data, kernel_function, base_density):
     """
     Returns an array of shape (data.shape[0] * data.shape[1] + 1, new_data.shape[0]) with
     - the ((i-1)*d+u, j)-th entry being partial_u k (X_i, Y_j), and
-    - the (nd + 1, j)-th entry being the inner product between hat{z} and partial_u k (Y_j, .),
+    - the (nd + 1, j)-th entry being the inner product between hat{z} and k (Y_j, .),
     for all i = 1, ..., data.shape[0], u = 1, ..., data.shape[1], and j = 1, ..., new_data.shape[0],
     where X_i is the i-th row of data and Y_j is the j-th row of new_data.
     This array is used to evaluate the natural parameter at new_data.
