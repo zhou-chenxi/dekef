@@ -23,8 +23,9 @@ class KernelFunction:
 class GaussianPoly2(KernelFunction):
 
     """
-    This is a class of a Gaussian kernel function plus a polynomial kernel function of degree 2,
-    k (x, y) = r1 * exp (- || x - y || ^ 2 / (2 * bw ^ 2)) + r2 * (x^\top y + c) ^ 2.
+    A class to compute the Gaussian kernel function plus a polynomial kernel function of degree 2,
+    k (x, y) = r1 * exp (- || x - y || ^ 2 / (2 * bw ^ 2)) + r2 * (x^\top y + c) ^ 2,
+    and its derivatives.
 
     ...
 
@@ -184,23 +185,32 @@ class GaussianPoly2(KernelFunction):
 
         r1 : float
             The multiplicative coefficient associated with the Gaussian kernel function.
+            Must be non-negative.
 
         r2 : float
             The multiplicative coefficient associated with the polynomial kernel function of degree 2.
+            Must be non-negative.
 
         c : float
             The non-homogenous additive constant in the polynomial kernel function of degree 2.
+            Must be non-negative.
 
         bw : float
             The bandwidth parameter in the Gaussian kernel function.
+            Must be strictly positive.
             
         """
         
         super().__init__()
 
-        if bw <= 0.:
-            raise ValueError("The bw parameter must be strictly positive.")
-
+        assert r1 >= 0., "The parameter r1 must be non-negative."
+        assert r2 >= 0., "The parameter r2 must be non-negative."
+        assert c >= 0., "The parameter c must be non-negative."
+        assert bw > 0., "The parameter bw must be strictly positive."
+        
+        if len(data.shape) == 1:
+            data = data.reshape(-1, 1)
+        
         self.data = data
         self.N, self.d = self.data.shape
         
@@ -1029,8 +1039,9 @@ class GaussianPoly2(KernelFunction):
 class RationalQuadPoly2(KernelFunction):
     
     """
-    This is a class of a rational quadratic kernel function plus a polynomial kernel function of degree 2,
-    k (x, y) = r1 * (1 + (||x - y|| ^ 2 / bw ^ 2)) ^ (-1) + r2 * (x^\top y + c) ^ 2.
+    A class to compute the rational quadratic kernel function plus a polynomial kernel function of degree 2,
+    k (x, y) = r1 * (1 + (||x - y|| ^ 2 / bw ^ 2)) ^ (-1) + r2 * (x^\top y + c) ^ 2,
+    and its derivatives.
 
     ...
 
@@ -1176,23 +1187,32 @@ class RationalQuadPoly2(KernelFunction):
 
         r1 : float
             The multiplicative coefficient associated with the rational quadratic kernel function.
+            Must be non-neagtive.
 
         r2 : float
             The multiplicative coefficient associated with the polynomial kernel function of degree 2.
+            Must be non-neagtive.
 
         c : float
             The non-homogenous additive constant in the polynomial kernel function of degree 2.
+            Must be non-neagtive.
 
         bw : float
             The bandwidth parameter in the rational quadratic kernel function.
+            Must be strictly positive.
 
         """
 
         super().__init__()
         
-        if bw <= 0.:
-            raise ValueError("The bw parameter must be strictly positive.")
-        
+        assert r1 >= 0., "The parameter r1 must be non-negative."
+        assert r2 >= 0., "The parameter r2 must be non-negative."
+        assert c >= 0., "The parameter c must be non-negative."
+        assert bw > 0., "The parameter bw must be strictly positive."
+
+        if len(data.shape) == 1:
+            data = data.reshape(-1, 1)
+            
         self.data = data
         self.N, self.d = self.data.shape
         
