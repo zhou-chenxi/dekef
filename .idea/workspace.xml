@@ -5,26 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abaf92d8-7d6e-400e-978d-17a897043246" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/dekef/negloglik_grid_points.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dekef/negloglik_params.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dekef/scorematching_penalized_grid_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/check.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/check.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/kernel_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/kernel_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/metric_correlation.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/metric_correlation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/negloglik_grid_points.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_grid_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dekef/negloglik_gubasis.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_gubasis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/negloglik_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dekef/negloglik_scorematchingbasis.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/negloglik_scorematchingbasis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/ortho_proj_hatz.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/ortho_proj_hatz.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/plot_contour_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_contour_2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/plot_density_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_density_1d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/plot_logdensity_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_logdensity_1d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/plot_natparam_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_natparam_1d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/scorematching_common_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/scorematching_common_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/scorematching_earlystopping.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/scorematching_earlystopping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/scorematching_penalized.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/scorematching_penalized.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dekef/unnormalized_density.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/unnormalized_density.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/density_estimation_1d_geyser.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/density_estimation_1d_geyser.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/density_estimation_1d_geyser-Copy1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/density_estimation_1d_geyser-Copy1.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
