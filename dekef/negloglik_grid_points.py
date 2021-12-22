@@ -122,7 +122,6 @@ class NegLogLikGridPoints:
 			)
 			
 			self.kernel_function = kernel_function
-			print(self.grid_points.shape)
 		
 		elif kernel_type == 'rationalquad_poly2':
 			
@@ -451,7 +450,7 @@ class NegLogLikGridPoints:
 
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
 
         batch_mc : bool, optional
@@ -506,14 +505,10 @@ class NegLogLikGridPoints:
 		
 		# form the Gram matrix
 		gram = self.kernel_function.kernel_gram_matrix(self.grid_points)
-		print(gram.shape)
 		data_gram = self.kernel_function.kernel_gram_matrix(data)
-		print(data_gram.shape)
 		grad_term2 = data_gram.mean(axis=1, keepdims=True)
-		print(grad_term2.shape)
 		
 		current_iter = start_pt.reshape(-1, 1)
-		print(current_iter.shape)
 		
 		# compute the gradient of the log-partition function at current_iter
 		if batch_mc:
@@ -540,7 +535,6 @@ class NegLogLikGridPoints:
 		
 		# compute the gradient of the loss function at current_iter
 		current_grad = grad_logpar - grad_term2 + lambda_param * np.matmul(gram, current_iter)
-		print(current_grad.shape)
 		
 		# compute the updated iter
 		new_iter = current_iter - step_size * current_grad
@@ -586,7 +580,6 @@ class NegLogLikGridPoints:
 			
 			# compute the gradient of the loss function
 			current_grad = grad_logpar - grad_term2 + lambda_param * np.matmul(gram, current_iter)
-			print(current_grad.shape)
 			
 			# compute the updated iter
 			new_iter = current_iter - step_size * current_grad
@@ -609,7 +602,7 @@ class NegLogLikGridPoints:
 	def eval_loss_function(self, new_data, coef, batchmc_params, batch_mc=True):
 		
 		"""
-        Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
+		Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
         A (f) - (1 / n) sum_{j=1}^n f (Y_j), where the natural parameter f is sum_{i=1}^N coef[i] k(x_i, .),
         x_1, ..., x_N are grid_points, and Y_1, ..., Y_n are new_data.
 
@@ -619,12 +612,12 @@ class NegLogLikGridPoints:
             The array of data at which the negative log-likelihood loss function is to be evaluated.
 
         coef : numpy.ndarray
-            The array of coefficients at which the negative log-likelihood loss function evaluated.
+            The array of coefficients at which the negative log-likelihood loss function is to be evaluated.
             Must be of shape (self.grid_points.shape[0], 1).
 
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
 
         batch_mc : bool, optional
@@ -711,7 +704,7 @@ class NegLogLikGridPoints:
 
         batchmc_params : dict
             The dictionary of parameters to control the batch Monte Carlo method
-            to approximate the log-partition function and its gradient.
+            to approximate the partition function and the gradient of the log-partition function.
             Must be returned from the function batch_montecarlo_params.
 
         save_dir : str
