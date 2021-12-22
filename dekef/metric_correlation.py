@@ -3,7 +3,7 @@ from dekef.unnormalized_density import *
 from dekef.check import *
 
 
-def metric_corr(data, test_data, kernel_function, base_density, coef, true_density):
+def metric_corr(data, test_data, kernel_function, base_density, coef, true_density, basis_type, grid_points=None):
     
     """
     Computes the cosine value of the angle and the Pearson's correlation between the density estimates and
@@ -37,6 +37,19 @@ def metric_corr(data, test_data, kernel_function, base_density, coef, true_densi
     true_density : true_density object
         The true density function from which data are drawn.
     
+    basis_type : str
+        The type of the basis functions in the natural parameter. Must be one of
+            - 'gubasis', the basis functions being the kernel functions centered at data,
+            - 'smbasis', the basis functions being the same as those in the score matching density estimator, i.e.,
+                         a linear combination of the first two partial derivatives of the kernel functions centered
+                         at data,
+            - 'grid_points', the basis functions being the kernel functions centered at a set of
+                             pre-specified grid points.
+    
+    grid_points : numpy.ndarray, optional
+        The set of grid points at which the kernel functions are centered.
+        Only need to supple when basis_type is 'grid_points'. Default is None.
+    
     Returns
     -------
     float, float
@@ -54,10 +67,13 @@ def metric_corr(data, test_data, kernel_function, base_density, coef, true_densi
     if len(test_data.shape) == 1:
         test_data = test_data.reshape(-1, 1)
     
+    if len(grid_points.shape) == 1:
+        grid_points = grid_points.reshape(-1, 1)
+    
     coef = coef.reshape(-1, 1)
         
     N, d = data.shape
-    n, d1 = data.shape
+    n, d1 = test_data.shape
     
     if d != d1:
         raise ValueError("The dimensionality of data does not match that of new_data.")
@@ -67,29 +83,36 @@ def metric_corr(data, test_data, kernel_function, base_density, coef, true_densi
         data=data,
         kernel_function=kernel_function,
         base_density=base_density,
-        coef=coef)
+        coef=coef,
+        basis_type=basis_type,
+        grid_points=grid_points
+    )
     
-    if coef.shape[0] == N:
+    if basis_type == 'gubasis':
         
         # using Gu's basis
         den_est = unnorm.density_eval_gubasis(test_data)
         
-    elif coef.shape[0] == N * d + 1:
+    elif basis_type == 'smbasis':
         
         # using score matching basis
         den_est = unnorm.density_eval_smbasis(test_data)
+    
+    elif basis_type == 'grid_points':
+    
+        # using grid points basis
+        den_est = unnorm.density_eval_grid_points(test_data)
         
     else:
         
-        raise ValueError(("The length of coef is not correct and matches neither Gu's basis functions "
-                         "nor score matching basis functions."))
+        raise ValueError(f"basis_type must be one of 'gubasis', 'smbasis', and 'grid_points', but got {basis_type}.")
     
     true_den = true_density.density_eval(test_data)
     
     # Numerator
     num = np.sum(true_den * den_est)
 
-    # Denomenator
+    # Denominator
     var1 = np.sum(true_den ** 2)
     var2 = np.sum(den_est ** 2)
     deno = np.sqrt(var1 * var2)
