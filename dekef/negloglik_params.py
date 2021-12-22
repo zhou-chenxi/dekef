@@ -2,7 +2,7 @@ def batch_montecarlo_params(mc_batch_size=1000, mc_tol=1e-2):
 	
 	"""
 	Returns a dictionary of parameters for the batch Monte Carlo method
-	in approximating the log-partition function and its gradient.
+	in approximating the partition function and the gradient of the log-partition function.
 
 	Parameters
 	----------
