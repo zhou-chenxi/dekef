@@ -41,6 +41,9 @@ def hatz(data, new_data, kernel_function, base_density):
 	if len(new_data.shape) == 1:
 		new_data = new_data.reshape(-1, 1)
 	
+	if data.shape[1] != new_data.shape[1]:
+		raise ValueError('The dimensionality of data and that of new_data do not match.')
+	
 	# partial derivatives of kernel function
 	kernel_partial_10 = kernel_function.partial_kernel_matrix_10(new_data=new_data)
 	kernel_partial_20 = kernel_function.partial_kernel_matrix_20(new_data=new_data)
@@ -155,6 +158,9 @@ def hatz_projection_C(data, new_data, kernel_function, base_density):
 	
 	if len(new_data.shape) == 1:
 		new_data = new_data.reshape(-1, 1)
+	
+	if data.shape[1] != new_data.shape[1]:
+		raise ValueError('The dimensionality of data and that of new_data do not match.')
 	
 	kernel_partial_10_newdata = kernel_function.partial_kernel_matrix_10(new_data=new_data)
 	
