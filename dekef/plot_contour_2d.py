@@ -87,7 +87,7 @@ def plot_contour_2d(data, kernel_function, base_density, basis_type, coef, norma
 		Only need to supple when basis_type is 'grid_points'. Default is None.
 		
 	save_plot : bool, optional
-		Whether to save the contour plot of the density estimate as a local file; default is False.
+		Whether to save the contour plot of the density estimate to a local file; default is False.
 	
 	save_dir : str, optional
 		The directory path to which the contour plot of the density estimate is saved;
