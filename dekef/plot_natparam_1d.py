@@ -12,19 +12,19 @@ def plot_natparam_1d_params(x_limit, y_limit, plot_pts_cnt=2000, figsize=(10, 10
     Parameters
     ----------
     x_limit : tuple
-        The tuple to specify the plotting domain of the density estimate.
+        The tuple to specify the plotting domain of the natural parameter.
         Must be of length 2. Both components must be finite numbers.
 
     y_limit : tuple
-        The tuple to specify the domain of the plot of density estimate in the vertical axis.
+        The tuple to specify the domain of the plot of the natural parameter in the vertical axis.
         Must be of length 2. Both components must be finite numbers.
 
     plot_pts_cnt : int, optional
-        The number of points to be evaluated along the plot_domain to make a plot of density estimate;
+        The number of points to be evaluated along the plot_domain to make a plot of the natural parameter;
         default is 2000.
 
     figsize : typle, optional
-        The size of the plot of density estimate; default is (10, 10).
+        The size of the plot of the natural parameter; default is (10, 10).
 
     natparam_color : str or tuple, optional
         The color for plotting the natural parameter; default is 'tab:blue'.
@@ -107,21 +107,21 @@ def plot_natparam_1d(data, kernel_function, base_density, basis_type, coef, meth
         Only need to supple when basis_type is 'grid_points'. Default is None.
         
     save_plot : bool, optional
-        Whether to save the plot of the density estimate as a local file; default is False.
+        Whether to save the plot of the natural parameter as a local file; default is False.
 
     save_dir : str, optional
-        The directory path to which the plot of the density estimate is saved;
+        The directory path to which the plot of the natural parameter is saved;
         only works when save_plot is set to be True. Default is None.
 
     save_filename : str, optional
-        The file name for the plot of the density estimate saved as a local file;
+        The file name for the plot of the natural parameter saved as a local file;
         only works when save_plot is set to be True. Default is None.
 
     Returns
     -------
     dict
-        A dictionary of x_vals, the values of the horizontal axis for plotting, and
-        natparam_vals, the values of the vertical axis for plotting.
+        A dictionary of 'x_vals', the values of the horizontal axis for plotting, and
+        'natparam_vals', the values of the vertical axis for plotting.
         
     """
 
