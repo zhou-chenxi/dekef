@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abaf92d8-7d6e-400e-978d-17a897043246" name="Default Changelist" comment="" />
+    <list default="true" id="abaf92d8-7d6e-400e-978d-17a897043246" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/plot_contour_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_contour_2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/plot_density_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_density_1d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/plot_logdensity_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_logdensity_1d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dekef/plot_natparam_1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/dekef/plot_natparam_1d.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
