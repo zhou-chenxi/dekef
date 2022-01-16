@@ -21,7 +21,7 @@ def check_basedensity(base_density):
 
 
 def check_kernelfunction(kernel_function):
-
+	
 	"""
 	Check the type of kernel_function.
 
