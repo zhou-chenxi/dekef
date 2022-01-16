@@ -7,59 +7,59 @@ from dekef.negloglik_params import *
 class NegLogLikGridPoints:
 	
 	"""
-    A class to estimate the probability density function by minimizing
-    the penalized negative log-likelihood loss function
-    in a kernel exponential family, where the natural parameter is a linear combination of kernel functions
-    centered at specified grid points.
-
-    ...
-
-    Attributes
-    ----------
-    data : numpy.ndarray
-        The array of observations whose density function is to be estimated.
-
-    grid_points : numpy.ndarray
-        The array at which the kernel functions are centered.
-
-    base_density : base_density object
-        The base density function used to estimate the probability density function.
-
-    kernel_function : kernel_function object
-        The kernel function used to estimate the probability density function.
-
-    Methods
-    -------
-    grad_logpar_batchmc(coef, batch_size, tol_param, compute_grad=True, print_error=False)
-        Approximates the partition function and the gradient of the log-partition function at coef
-        with the kernel functions centered at self.grid_points.
-        The approximation method used is the batch Monte Carlo method.
-        Terminate the sampling process until the relative difference of
-        two consecutive approximations is less than tol_param.
-
-    grad_logpar_batchmc_se(coef, batch_size, tol_param, compute_grad=True, print_error=False)
-        Approximates the partition function and the gradient of the log-partition function at coef
-        with the kernel functions centered at self.grid_points.
-        The approximation method used is the batch Monte Carlo method.
-        Terminate the sampling process until the standard deviation of the approximations is less than tol_param.
-
-    coef(lambda_param, optalgo_params, batchmc_params, batch_mc=True, print_error=True)
-        Returns the solution that minimizes the penalized negative log-likelihood loss function
-        with the basis functions centered at self.grid_points.
-
-    eval_loss_function(new_data, coef, batchmc_params, batch_mc=True)
-        Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
-        A (f) - (1 / n) sum_{j=1}^n f (Y_j), where the natural parameter f is sum_{i=1}^N coef[i] k(x_i, .),
-        x_1, ..., x_N are grid_points, and Y_1, ..., Y_n are new_data.
-
-    penalized_optlambda(lambda_cand, k_folds, print_error, optalgo_params,
-                        batchmc_params, save_dir, save_info=False, batch_mc=True)
-        Selects the optimal penalty parameter in the penalized negative log-likelihood density estimation
-        using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
-        The basis functions of the natural parameter are the kernel functions centered at self.grid_points.
-
-    """
+	A class to estimate the probability density function by minimizing
+	the penalized negative log-likelihood loss function
+	in a kernel exponential family, where the natural parameter is a linear combination of kernel functions
+	centered at specified grid points.
 	
+	...
+	
+	Attributes
+	----------
+	data : numpy.ndarray
+		The array of observations whose density function is to be estimated.
+	
+	grid_points : numpy.ndarray
+		The array at which the kernel functions are centered.
+	
+	base_density : base_density object
+		The base density function used to estimate the probability density function.
+	
+	kernel_function : kernel_function object
+		The kernel function used to estimate the probability density function.
+	
+	Methods
+	-------
+	grad_logpar_batchmc(coef, batch_size, tol_param, compute_grad=True, print_error=False)
+		Approximates the partition function and the gradient of the log-partition function at coef
+		with the kernel functions centered at self.grid_points.
+		The approximation method used is the batch Monte Carlo method.
+		Terminate the sampling process until the relative difference of
+		two consecutive approximations is less than tol_param.
+	
+	grad_logpar_batchmc_se(coef, batch_size, tol_param, compute_grad=True, print_error=False)
+		Approximates the partition function and the gradient of the log-partition function at coef
+		with the kernel functions centered at self.grid_points.
+		The approximation method used is the batch Monte Carlo method.
+		Terminate the sampling process until the standard deviation of the approximations is less than tol_param.
+	
+	coef(lambda_param, optalgo_params, batchmc_params, batch_mc=True, print_error=True)
+		Returns the solution that minimizes the penalized negative log-likelihood loss function
+		with the basis functions centered at self.grid_points.
+	
+	eval_loss_function(new_data, coef, batchmc_params, batch_mc=True)
+		Evaluates the negative log-likelihood loss function evaluated at coef and on new_data, i.e.,
+		A (f) - (1 / n) sum_{j=1}^n f (Y_j), where the natural parameter f is sum_{i=1}^N coef[i] k(x_i, .),
+		x_1, ..., x_N are grid_points, and Y_1, ..., Y_n are new_data.
+	
+	penalized_optlambda(lambda_cand, k_folds, print_error, optalgo_params,
+						batchmc_params, save_dir, save_info=False, batch_mc=True)
+		Selects the optimal penalty parameter in the penalized negative log-likelihood density estimation
+		using k-fold cross validation and computes the coefficient vector at this optimal penalty parameter.
+		The basis functions of the natural parameter are the kernel functions centered at self.grid_points.
+	
+	"""
+
 	def __init__(self, data, grid_points, base_density,
 				 kernel_type='gaussian_poly2', kernel_r1=1.0, kernel_r2=0., kernel_c=0., kernel_bw=1.0):
 		
