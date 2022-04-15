@@ -210,8 +210,6 @@ class ScoreMatchingPenalizedGridPoints:
             base_density=self.base_density
         ).reshape(-1, 1)
 
-        print(eq_lhs.shape, eq_rhs.shape)
-
         coef = np.linalg.solve(eq_lhs, eq_rhs)
 
         return coef
