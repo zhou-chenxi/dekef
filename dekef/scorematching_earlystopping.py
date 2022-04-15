@@ -223,7 +223,7 @@ class ScoreMatchingEarlyStopping:
 		Returns
 		-------
 		dict
-			A dictionary containing opt_lambda, the optimal number of iterations, and
+			A dictionary containing opt_iter, the optimal number of iterations, and
 			opt_coef, the coefficient vector of basis functions in the early stopping score matching density estimate
 			at the optimal number of iterations.
 		
