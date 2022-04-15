@@ -347,7 +347,7 @@ class ScoreMatchingGridPointsEarlyStopping:
         
         opt_coef = self.coef(
             data=self.data,
-            iter_num=opt_iternum,
+            iter_num=int(opt_iternum),
             step_size=step_size,
             threshold=threshold
         )
