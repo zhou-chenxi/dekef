@@ -65,7 +65,7 @@ npm test
 
 ## Meta
 
-Chenxi Zhou – zhou.779@osu.edu
+Chenxi Zhou – chenxizhou.jayden@gmail.com
 
 [https://github.com/zhoucx1119/dekef](https://github.com/zhoucx1119/dekef)
 
