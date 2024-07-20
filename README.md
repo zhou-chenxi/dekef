@@ -65,7 +65,7 @@ npm test
 
 Chenxi Zhou – chenxizhou.jayden@gmail.com
 
-[https://github.com/zhoucx1119/dekef](https://github.com/zhoucx1119/dekef)
+[https://github.com/zhou-chenxi/dekef](https://github.com/zhou-chenxi/dekef)
 
 <!---
 ## Contributing
