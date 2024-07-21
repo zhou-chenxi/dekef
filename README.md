@@ -1,5 +1,5 @@
 # dekef
-> Density estimation in kernel exponential families. 
+> Density estimation in infinite-dimensional kernel exponential families. 
 
 <!---[![NPM Version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
@@ -7,7 +7,7 @@
 
 `dekef` is a python package providing tools for 
 
-- computing density estimates in kernel exponential families using the score matching
+- computing density estimates in infinite-dimensional kernel exponential families using the score matching
   loss function and the negative log-likelihood loss function, 
 - visualizing the density estimates when data are 1-dimensional or 
   the contour plot of the density estimates when data are 
