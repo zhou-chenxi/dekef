@@ -1,7 +1,6 @@
 # dekef
 > Density estimation in kernel exponential families. 
 
-[![Project stage: Development][project-stage-badge: Development]][project-stage-page]
 
 <!---[![NPM Version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
@@ -65,9 +64,9 @@ npm test
 
 ## Meta
 
-Chenxi Zhou – zhou.779@osu.edu
+Chenxi Zhou – chenxizhou.jayden@gmail.com
 
-[https://github.com/zhoucx1119/dekef](https://github.com/zhoucx1119/dekef)
+[https://github.com/zhou-chenxi/dekef](https://github.com/zhou-chenxi/dekef)
 
 <!---
 ## Contributing
